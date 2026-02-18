@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAMedio - Diagnóstico Inteligente</title>
+    <!-- Modern Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-animation"></div>
+    
+    <main class="container glass-panel">
+        <header>
+            <div class="logo-container">
+                <div class="pulse-ring"></div>
+                <h1>RAMedio</h1>
+            </div>
+            <p class="subtitle">Sistema Distribuido de Diagnóstico de PCs</p>
+        </header>
+
+        <form id="diagnosis-form">
+            <section class="form-group primary-input">
+                <label for="device_id">ID del Equipo (Auto-Detectado) <span class="required">*</span></label>
+                <input type="text" id="device_id" name="device_id" placeholder="Detectando ID del equipo..." readonly required>
+                <small>Este ID vincula tu reporte con los datos de hardware enviados por el agente RAMedio.</small>
+            </section>
+
+            <div class="divider"></div>
+
+            <section class="symptoms-section">
+                <h2>Cuestionario de Síntomas</h2>
+
+                <div class="question-grid">
+                    <!-- Q1 -->
+                    <div class="question-card">
+                        <label>1. ¿Sientes que el equipo está inusualmente lento al abrir programas?</label>
+                        <div class="radio-group">
+                            <input type="radio" id="slow_yes" name="is_slow" value="true" required>
+                            <label for="slow_yes" class="radio-btn">Sí</label>
+                            
+                            <input type="radio" id="slow_no" name="is_slow" value="false">
+                            <label for="slow_no" class="radio-btn">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="question-card">
+                        <label>2. ¿El equipo se apaga o reinicia solo de forma inesperada?</label>
+                        <div class="radio-group">
+                            <input type="radio" id="restart_yes" name="random_restarts" value="true" required>
+                            <label for="restart_yes" class="radio-btn">Sí</label>
+                            
+                            <input type="radio" id="restart_no" name="random_restarts" value="false">
+                            <label for="restart_no" class="radio-btn">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q3 -->
+                    <div class="question-card">
+                        <label>3. ¿Escuchas ruidos extraños de ventiladores o discos mecánicos?</label>
+                        <div class="radio-group">
+                            <input type="radio" id="noise_yes" name="weird_noises" value="true" required>
+                            <label for="noise_yes" class="radio-btn">Sí</label>
+                            
+                            <input type="radio" id="noise_no" name="weird_noises" value="false">
+                            <label for="noise_no" class="radio-btn">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q4 -->
+                    <div class="question-card">
+                        <label>4. ¿Has notado que la máquina se calienta demasiado al tacto?</label>
+                        <div class="radio-group">
+                            <input type="radio" id="hot_yes" name="overheating" value="true" required>
+                            <label for="hot_yes" class="radio-btn">Sí</label>
+                            
+                            <input type="radio" id="hot_no" name="overheating" value="false">
+                            <label for="hot_no" class="radio-btn">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q5 -->
+                    <div class="question-card">
+                        <label>5. ¿Aparecen pantallas azules o errores críticos con frecuencia?</label>
+                        <div class="radio-group">
+                            <input type="radio" id="bsod_yes" name="bsod_errors" value="true" required>
+                            <label for="bsod_yes" class="radio-btn">Sí</label>
+                            
+                            <input type="radio" id="bsod_no" name="bsod_errors" value="false">
+                            <label for="bsod_no" class="radio-btn">No</label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <button type="submit" class="submit-btn" id="submit-btn">
+                <span>Enviar Datos de Diagnóstico</span>
+                <div class="loader hidden"></div>
+            </button>
+        </form>
+        
+        <div id="success-message" class="hidden">
+            <div class="success-icon">✓</div>
+            <h3>¡Datos Registrados!</h3>
+            
+            <div id="diagnosis-box" class="diagnosis-box hidden">
+                <h4>Diagnóstico Inteligente (ML)</h4>
+                <p id="diagnosis-text" class="diagnosis-text">Analizando...</p>
+            </div>
+
+            <button id="reset-btn" class="secondary-btn">Enviar otro reporte</button>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
