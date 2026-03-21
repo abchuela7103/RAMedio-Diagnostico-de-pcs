@@ -55,7 +55,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 random_restarts: formData.get('random_restarts') === 'true',
                 weird_noises: formData.get('weird_noises') === 'true',
                 overheating: formData.get('overheating') === 'true',
-                bsod_errors: formData.get('bsod_errors') === 'true'
+                bsod_errors: formData.get('bsod_errors') === 'true',
+                screen_flicker: formData.get('screen_flicker') === 'true',
+                apps_crashing: formData.get('apps_crashing') === 'true',
+                battery_issue: formData.get('battery_issue') === 'true',
+                burnt_smell: formData.get('burnt_smell') === 'true',
+                visual_artifacts: formData.get('visual_artifacts') === 'true',
+                system_freezes: formData.get('system_freezes') === 'true',
+                usb_disconnects: formData.get('usb_disconnects') === 'true',
+                network_drops: formData.get('network_drops') === 'true',
+                slow_boot: formData.get('slow_boot') === 'true',
+                file_corruption: formData.get('file_corruption') === 'true'
             }
         };
 

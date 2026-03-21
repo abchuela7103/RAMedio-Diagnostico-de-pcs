@@ -13,6 +13,8 @@ class MetricRecord(Base):
     cpu = Column(Float, nullable=True)
     ram = Column(Float, nullable=True)
     disk = Column(Float, nullable=True)
+    disk_active = Column(Float, nullable=True)
+    gpu = Column(Float, nullable=True)
     
     # Mejoras
     battery_percent = Column(Float, nullable=True)
@@ -31,3 +33,13 @@ class SymptomRecord(Base):
     weird_noises = Column(Boolean, default=False)
     overheating = Column(Boolean, default=False)
     bsod_errors = Column(Boolean, default=False)
+    screen_flicker = Column(Boolean, default=False)
+    apps_crashing = Column(Boolean, default=False)
+    battery_issue = Column(Boolean, default=False)
+    burnt_smell = Column(Boolean, default=False)
+    visual_artifacts = Column(Boolean, default=False)
+    system_freezes = Column(Boolean, default=False)
+    usb_disconnects = Column(Boolean, default=False)
+    network_drops = Column(Boolean, default=False)
+    slow_boot = Column(Boolean, default=False)
+    file_corruption = Column(Boolean, default=False)
