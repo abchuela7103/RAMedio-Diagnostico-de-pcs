@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Función para auto-detectar Device ID
     async function fetchDeviceId() {
         try {
-            const response = await fetch('http://ramedio.onrender.com/api/device-id');
+            const response = await fetch('https://ramedio-diagnostico-de-pcs.onrender.com/api/device-id');
             if (response.ok) {
                 const data = await response.json();
                 deviceIdInput.value = data.device_id;
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log("Enviando datos al servidor...");
             console.log(JSON.stringify(payload, null, 2));
 
-            const response = await fetch('http://localhost:8000/api/symptoms', {
+            const response = await fetch('https://ramedio-diagnostico-de-pcs.onrender.com/api/symptoms', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 try {
                     // Segundo Fetch: Pedir el Diagnóstico al modelo predictivo
-                    const mlResponse = await fetch(`http://localhost:8000/api/diagnostico/${payload.device_id}`);
+                    const mlResponse = await fetch(`https://ramedio-diagnostico-de-pcs.onrender.com/api/diagnostico/${payload.device_id}`);
                     if (mlResponse.ok) {
                         const mlData = await mlResponse.json();
 
