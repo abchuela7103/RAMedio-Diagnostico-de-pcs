@@ -15,7 +15,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const data = await response.json();
                 deviceIdInput.value = data.device_id;
             } else {
-                deviceIdInput.value = "Error detectando ID";
+                deviceIdInput.value = "";
+                deviceIdInput.placeholder = "Escribe el nombre de tu equipo (Ej. LAPTOP-BRYAN)";
                 deviceIdInput.removeAttribute('readonly'); // Permitir escritura manual en caso de error
             }
         } catch (error) {

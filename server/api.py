@@ -131,6 +131,7 @@ def run_diagnostics(device_id: str, db: Session = Depends(get_db)):
 
 @app.get("/api/device-id")
 def get_device_id():
-    """Retorna el nombre del host (Device ID) para autocompletar el formulario"""
-    return {"device_id": socket.gethostname()}
+    """Retorna un error intencional. En la nube no podemos saber el hostname local del usuario."""
+    from fastapi import HTTPException
+    raise HTTPException(status_code=501, detail="Manual ID entry required in cloud mode.")
 

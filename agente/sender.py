@@ -1,6 +1,6 @@
 import requests
 
-SERVER_URL = "http://127.0.0.1:8000/metrics"
+SERVER_URL = "https://ramedio-diagnostico-de-pcs.onrender.com/metrics"
 
 def send_metrics(payload):
     try:
