@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Lanzar en Chrome",
+            "type": "chrome",
+            "request": "launch",
+            "file": "${workspaceFolder}/web/index.html"
+        },
+        {
+            "name": "Lanzar en Edge",
+            "type": "msedge",
+            "request": "launch",
+            "file": "${workspaceFolder}/web/index.html"
+        }
+    ]
+}

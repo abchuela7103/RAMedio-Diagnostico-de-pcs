@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Función para auto-detectar Device ID
     async function fetchDeviceId() {
         try {
-            const response = await fetch('http://localhost:8000/api/device-id');
+            const response = await fetch('http://ramedio.onrender.com/api/device-id');
             if (response.ok) {
                 const data = await response.json();
                 deviceIdInput.value = data.device_id;
