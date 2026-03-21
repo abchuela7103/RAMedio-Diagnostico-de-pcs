@@ -7,23 +7,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const resetBtn = document.getElementById('reset-btn');
     const deviceIdInput = document.getElementById('device_id');
 
-    // Función para auto-detectar Device ID
-    async function fetchDeviceId() {
-        try {
-            const response = await fetch('https://ramedio-diagnostico-de-pcs.onrender.com/api/device-id');
-            if (response.ok) {
-                const data = await response.json();
-                deviceIdInput.value = data.device_id;
-            } else {
-                deviceIdInput.value = "";
-                deviceIdInput.placeholder = "Escribe el nombre de tu equipo (Ej. LAPTOP-BRYAN)";
-                deviceIdInput.removeAttribute('readonly'); // Permitir escritura manual en caso de error
-            }
-        } catch (error) {
-            console.error("Error contactando al servidor:", error);
+    // Función para auto-detectar Device ID desde URL o caché local
+    function fetchDeviceId() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlId = urlParams.get('device_id');
+        const cachedId = localStorage.getItem('ramedio_device_id');
+
+        if (urlId) {
+            deviceIdInput.value = urlId;
+            deviceIdInput.setAttribute('readonly', 'true');
+        } else if (cachedId) {
+            deviceIdInput.value = cachedId;
+            // No readonly so they can clear it if they want
+        } else {
             deviceIdInput.value = "";
-            deviceIdInput.placeholder = "Servidor desconectado. Escribe tu ID manual.";
-            deviceIdInput.removeAttribute('readonly'); // Permitir escritura manual
+            deviceIdInput.placeholder = "Escribe el nombre de tu equipo (Ej. LAPTOP-BRYAN)";
+            deviceIdInput.removeAttribute('readonly'); 
         }
     }
 
@@ -40,10 +39,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Recopilar datos del formulario
         const formData = new FormData(form);
+        const deviceId = formData.get('device_id');
+
+        // Guardar el ID en caché para el futuro (así no tienen que volver a teclearlo)
+        if (deviceId) {
+            localStorage.setItem('ramedio_device_id', deviceId);
+        }
 
         // Estructurar el payload final para ML / Backend
         const payload = {
-            device_id: formData.get('device_id'),
+            device_id: deviceId,
             timestamp: new Date().toISOString(),
             symptoms: {
                 is_slow: formData.get('is_slow') === 'true',

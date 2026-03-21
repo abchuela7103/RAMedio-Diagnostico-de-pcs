@@ -11,6 +11,9 @@ device_id = socket.gethostname()
 # #Archivo donde guardaremos los datos recolectados del agente, esto para poder entrenar el modelo mas adelante
 LOG_FILE = "metrics_log.jsonl"
 
+print(f"\n🌐 Para realizar el diagnóstico de este equipo, abre el siguiente enlace:")
+print(f"👉 https://ramedio.onrender.com/?device_id={device_id}\n")
+
 while True:
     data = collect_metrics()
 
