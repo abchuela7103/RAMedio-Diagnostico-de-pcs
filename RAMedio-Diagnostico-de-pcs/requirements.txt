@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+psutil
+requests
+pydantic
+python-dotenv
+psycopg2-binary
+sqlalchemy
+numpy
+pandas
+scikit-learn
+joblib
+matplotlib
+seaborn
