@@ -4,11 +4,18 @@ import time
 import json
 from datetime import datetime, UTC 
 import socket
+import webbrowser
 
 # Identificador del equipo
 device_id = socket.gethostname()
 
-# #Archivo donde guardaremos los datos recolectados del agente, esto para poder entrenar el modelo mas adelante
+# ¡Magia UX! Abrir el navegador automáticamente al usuario
+url_formulario = f"https://ramedio.onrender.com/?device_id={device_id}"
+print(f"\n🌐 Abriendo formulario de diagnóstico de forma automática en tu navegador:")
+print(f"👉 {url_formulario}\n")
+webbrowser.open(url_formulario)
+
+# Archivo donde guardaremos los datos recolectados del agente
 LOG_FILE = "metrics_log.jsonl"
 
 while True:
