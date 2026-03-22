@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAMedio - Panel de Control Automático</title>
+    <!-- Modern Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Apache ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        @media (min-width: 900px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .full-width {
+                grid-column: 1 / -1;
+            }
+        }
+        .chart-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .chart-card h3 {
+            margin-top: 0;
+            color: #fff;
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+        .input-group input {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.4);
+            color: white;
+            width: 300px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 10px rgba(79, 172, 254, 0.5);
+        }
+        .input-group button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .input-group button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
+        }
+        .nav-link {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #4facfe;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .nav-link:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation"></div>
+    
+    <main class="container glass-panel" style="max-width: 1200px; padding: 30px;">
+        <a href="index.html" class="nav-link">← Regresar al Formulario (Paciente)</a>
+        <header>
+            <div class="logo-container">
+                <div class="pulse-ring"></div>
+                <h1>Panel de Control TI</h1>
+            </div>
+            <p class="subtitle">Monitoreo y Auditoría de Algoritmos Inteligentes</p>
+        </header>
+
+        <div class="input-group">
+            <input type="text" id="dashboard_device_id" placeholder="Ingresa ID de Computadora...">
+            <button id="load_metrics_btn">Cargar Telemetría</button>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Hardware History (Line) -->
+            <div class="chart-card full-width">
+                <h3>Historial de Rendimiento en Tiempo Real</h3>
+                <div id="hardware-chart" style="width: 100%; height: 350px;"></div>
+            </div>
+
+            <!-- Model Accuracy (Gauge) -->
+            <div class="chart-card">
+                <h3>Precisión General del Algoritmo (Trust Score)</h3>
+                <div id="accuracy-gauge" style="width: 100%; height: 350px;"></div>
+            </div>
+
+            <!-- Decision Tree (Tree) -->
+            <div class="chart-card full-width">
+                <h3>Estructura Lógica del Árbol de Decisión (Caja Blanca)</h3>
+                <p style="text-align: center; color: #acc; font-size: 0.9rem; margin-top: -10px; margin-bottom: 10px;">
+                    Puedes hacer clic en los nodos circulares para expandir o colapsar las sub-reglas, y usar el ratón para hacer zoom/paneo.
+                </p>
+                <div id="tree-chart" style="width: 100%; height: 600px;"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

@@ -169,3 +169,26 @@ def get_device_id():
     from fastapi import HTTPException
     raise HTTPException(status_code=501, detail="Manual ID entry required in cloud mode.")
 
+@app.get("/api/dashboard/history/{device_id}")
+def get_device_history(device_id: str, db: Session = Depends(get_db)):
+    """Obtiene el historial de métricas de hardware de un equipo."""
+    records = db.query(MetricRecord).filter(MetricRecord.device_id == device_id).order_by(MetricRecord.timestamp.desc()).limit(20).all()
+    records.reverse()
+    return {
+        "timestamps": [r.timestamp.strftime("%H:%M:%S") for r in records],
+        "cpu": [r.cpu for r in records],
+        "ram": [r.ram for r in records]
+    }
+
+@app.get("/api/ml/tree")
+def get_ml_tree():
+    """Obtiene la estructura del árbol de decisión y la precisión para ECharts."""
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from ML.classifier import get_tree_structure, get_model_accuracy
+    
+    return {
+        "accuracy": get_model_accuracy(),
+        "tree": get_tree_structure()
+    }
