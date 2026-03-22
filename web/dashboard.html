@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAMedio - Panel de Control Automático</title>
+    <title>RAMedio - Dashboard</title>
     <!-- Modern Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -98,7 +98,7 @@
     <div class="background-animation"></div>
     
     <main class="container glass-panel" style="max-width: 1200px; padding: 30px;">
-        <a href="index.html" class="nav-link">← Regresar al Formulario (Paciente)</a>
+        <a href="index.html" class="nav-link">← Regresar al Formulario</a>
         <header>
             <div class="logo-container">
                 <div class="pulse-ring"></div>
@@ -121,13 +121,13 @@
 
             <!-- Model Accuracy (Gauge) -->
             <div class="chart-card">
-                <h3>Precisión General del Algoritmo (Trust Score)</h3>
+                <h3>Precisión General del Algoritmo</h3>
                 <div id="accuracy-gauge" style="width: 100%; height: 350px;"></div>
             </div>
 
             <!-- Model Probabilities (Bar Chart) -->
             <div class="chart-card full-width">
-                <h3>Análisis Predictivo Detallado (Red Neuronal / ML)</h3>
+                <h3>Análisis Predictivo Detallado</h3>
                 <h2 id="current-diagnosis-text" style="text-align:center; color:#00f2fe; margin-top: -10px; margin-bottom: 5px;">Calculando...</h2>
                 <p id="current-solution-text" style="text-align:center; color:#acc; margin-bottom: 20px; font-size: 1.05rem; display: none; margin-top: 5px;"></p>
                 <div id="proba-chart" style="width: 100%; height: 350px;"></div>

@@ -205,7 +205,10 @@ def get_device_history(device_id: str, db: Session = Depends(get_db)):
     return {
         "timestamps": [r.timestamp.strftime("%H:%M:%S") for r in records],
         "cpu": [r.cpu for r in records],
-        "ram": [r.ram for r in records]
+        "ram": [r.ram for r in records],
+        "disk": [r.disk or 0 for r in records],
+        "disk_active": [r.disk_active or 0 for r in records],
+        "gpu": [r.gpu or 0 for r in records]
     }
 
 @app.get("/api/ml/tree")
@@ -220,3 +223,18 @@ def get_ml_tree():
         "accuracy": get_model_accuracy(),
         "tree": get_tree_structure()
     }
+
+@app.get("/api/metrics/status/{device_id}")
+def check_metrics_status(device_id: str, db: Session = Depends(get_db)):
+    """Medida de seguridad para evitar diagnósticos si las métricas no se han enviado por el agente."""
+    from datetime import datetime
+    latest = db.query(MetricRecord).filter(MetricRecord.device_id == device_id).order_by(MetricRecord.timestamp.desc()).first()
+    
+    if not latest:
+        return {"has_metrics": False, "reason": "No hay métricas registradas en absoluto."}
+        
+    delta = datetime.utcnow() - latest.timestamp
+    if delta.total_seconds() > 3600: # Expiran tras 1 hora max
+        return {"has_metrics": False, "reason": "Las métricas están caducadas (más de 1 hora). Vuelve a iniciar el agente."}
+        
+    return {"has_metrics": True}

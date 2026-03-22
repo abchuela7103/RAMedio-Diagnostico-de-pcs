@@ -45,14 +45,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnText.textContent = 'Procesando...';
         loader.classList.remove('hidden');
 
-        // Recopilar datos del formulario
+        // Recopilar datos del formulario para obtener deviceId temprano
         const formData = new FormData(form);
         const deviceId = formData.get('device_id');
-
-        // Guardar el ID en caché para el futuro (así no tienen que volver a teclearlo)
-        if (deviceId) {
-            localStorage.setItem('ramedio_device_id', deviceId);
-        }
 
         // Estructurar el payload final para ML / Backend
         const payload = {

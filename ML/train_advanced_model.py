@@ -53,7 +53,7 @@ def generate_chaotic_synthetic_data(num_samples=15000):
             row["disk_active"] = np.random.normal(95, 5) # Disco permanentemente escrito
             row["slow_boot"] = np.random.choice([1, 0], p=[0.9, 0.1])
             row["is_slow"] = 1
-            label = "Falla Inminente de Disco (Corrupción/SMART)"
+            label = "Falla Inminente de Disco"
             
         elif scenario == "ram_failure":
             row["system_freezes"] = np.random.choice([1, 0], p=[0.8, 0.2])
@@ -61,7 +61,7 @@ def generate_chaotic_synthetic_data(num_samples=15000):
             row["apps_crashing"] = np.random.choice([1, 0], p=[0.7, 0.3])
             row["ram"] = np.random.normal(95, 5) # Out of memory constante
             row["is_slow"] = np.random.choice([1, 0], p=[0.7, 0.3])
-            label = "Saturación o Defecto en RAM (BSODs frecuentes)"
+            label = "Saturación o Defecto en RAM"
             
         elif scenario == "psu_mobo_failure":
             row["usb_disconnects"] = np.random.choice([1, 0], p=[0.9, 0.1])
@@ -73,14 +73,14 @@ def generate_chaotic_synthetic_data(num_samples=15000):
         elif scenario == "network_failure":
             row["network_drops"] = np.random.choice([1, 0], p=[0.95, 0.05])
             row["is_slow"] = np.random.choice([1, 0], p=[0.3, 0.7])
-            label = "Problema del Adaptador de Red (Wi-Fi/Ethernet)"
+            label = "Problema del Adaptador de Red"
             
         elif scenario == "cpu_bottleneck":
             row["cpu"] = np.random.normal(98, 2)
             row["is_slow"] = 1
             row["apps_crashing"] = np.random.choice([1, 0], p=[0.3, 0.7])
             row["slow_boot"] = np.random.choice([1, 0], p=[0.6, 0.4])
-            label = "Cuello de Botella Máximo en Procesador (CPU)"
+            label = "Cuello de Botella Máximo en Procesador"
             
         elif scenario == "malware_infection":
             row["cpu"] = np.random.normal(85, 10)
@@ -88,7 +88,7 @@ def generate_chaotic_synthetic_data(num_samples=15000):
             row["disk_active"] = np.random.normal(60, 20)
             row["is_slow"] = 1
             row["system_freezes"] = np.random.choice([1, 0], p=[0.3, 0.7])
-            label = "Comportamiento Anómalo (Infección de Malware Pts. Alta)"
+            label = "Comportamiento Anómalo (Infección de Malware)"
             
         # Limitar para evitar valores ilógicos fuera de 0-100 en hardware
         row["cpu"] = np.clip(row["cpu"], 0, 100)
@@ -103,26 +103,25 @@ def generate_chaotic_synthetic_data(num_samples=15000):
     return pd.DataFrame(data)
 
 if __name__ == "__main__":
-    print("Iniciando Generación de Datos Sintéticos CAÓTICOS (15,000 muestras)...")
+    print("Iniciando Generación de Datos Sintéticos...")
     df = generate_chaotic_synthetic_data(15000)
     
     X = df.drop("label", axis=1)
     y = df["label"]
     
-    print("Entrenando Árbol de Decisión Complejo (Hiper-ramificado)...")
+    print("Entrenando Árbol de Decisión...")
     # Al aumentar la profundidad máxima y bajar el min_samples, forzamos un árbol ENORME.
     model = DecisionTreeClassifier(max_depth=20, min_samples_leaf=4, min_samples_split=10, random_state=42)
     model.fit(X, y)
     
     # Evaluar complejidad y precisión lograda
     train_acc = model.score(X, y)
-    print(f"Precisión del Modelo en base ruidosa: {train_acc * 100:.2f}%")
+    print(f"Precisión del Modelo: {train_acc * 100:.2f}%")
     print(f"Profundidad real alcanzada: {model.tree_.max_depth} niveles lógicos")
-    print(f"Total de nodos fractales creados: {model.tree_.node_count}")
+    print(f"Total de nodos creados: {model.tree_.node_count}")
     
     # Usar __file__ para ubicar dinámicamente el proyecto 
     model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "modelo_decision_tree.pkl")
     joblib.dump(model, model_path)
     
-    print(f"ÉXITO: Modelo Denso Guardado en {model_path}")
-    print("¡El Dashboard ahora mostrará un árbol de decisión verdaderamente enorme e inescrutable!")
+    print(f"ÉXITO: Modelo Guardado en {model_path}")

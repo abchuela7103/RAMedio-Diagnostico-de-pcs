@@ -36,6 +36,9 @@ def recolectar_metricas(app):
     app.lbl_estado.config(text="Recolectando métricas... Por favor espera.", fg=TEXT_MAIN)
     app.progress.config(value=0)
     
+    # Mostrar el botón Web Inmediatamente - Flujo de Sistemas Distribuidos
+    app.root.after(0, lambda: app.btn_formulario.pack(pady=15))
+    
     # Ejecutamos la recolección en un hilo separado
     def tarea():
         try:

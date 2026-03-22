@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         backgroundColor: 'rgba(0, 0, 0, 0.8)',
                         textStyle: { color: '#fff' }
                     },
-                    legend: { data: ['CPU %', 'RAM %'], textStyle: { color: '#ddd' } },
+                    legend: { data: ['CPU %', 'RAM %', 'Disco %', 'Disco Act. %', 'GPU %'], textStyle: { color: '#ddd' } },
                     grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
                     xAxis: {
                         type: 'category',
@@ -233,6 +233,30 @@ document.addEventListener('DOMContentLoaded', async () => {
                                     { offset: 1, color: 'rgba(30, 144, 255, 0.0)' }
                                 ])
                             }
+                        },
+                        {
+                            name: 'Disco %',
+                            type: 'line',
+                            smooth: true,
+                            data: data.disk,
+                            symbol: 'none',
+                            lineStyle: { width: 2, color: '#ffa502' }
+                        },
+                        {
+                            name: 'Disco Act. %',
+                            type: 'line',
+                            smooth: true,
+                            data: data.disk_active,
+                            symbol: 'none',
+                            lineStyle: { width: 2, type: 'dashed', color: '#eccc68' }
+                        },
+                        {
+                            name: 'GPU %',
+                            type: 'line',
+                            smooth: true,
+                            data: data.gpu,
+                            symbol: 'none',
+                            lineStyle: { width: 3, color: '#2ed573' }
                         }
                     ]
                 };
