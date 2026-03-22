@@ -55,6 +55,9 @@ def predict_status(hardware_metrics: dict, symptoms_data: dict) -> str:
         "file_corruption": 1 if symptoms_data.get("file_corruption") else 0,
     }])
 
+    # Re-ordenar columnas para que coincidan 100% con cómo se entrenó
+    input_data = input_data[model.feature_names_in_]
+
     # Predecir usando el modelo cargado
     prediction = model.predict(input_data)
     
@@ -91,6 +94,8 @@ def predict_status_with_proba(hardware_metrics: dict, symptoms_data: dict) -> di
         "slow_boot": 1 if symptoms_data.get("slow_boot") else 0,
         "file_corruption": 1 if symptoms_data.get("file_corruption") else 0,
     }])
+
+    input_data = input_data[model.feature_names_in_]
 
     prediction = model.predict(input_data)[0]
     probas = model.predict_proba(input_data)[0]
