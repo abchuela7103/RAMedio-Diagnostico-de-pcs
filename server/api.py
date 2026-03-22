@@ -108,62 +108,73 @@ def receive_symptoms(data: SymptomPayload, db: Session = Depends(get_db)):
 
 @app.get("/api/diagnostico/{device_id}")
 def run_diagnostics(device_id: str, db: Session = Depends(get_db)):
-    # 1. Obtener la última métrica de hardware
-    latest_metric = db.query(MetricRecord).filter(MetricRecord.device_id == device_id).order_by(MetricRecord.timestamp.desc()).first()
-    
-    # 2. Obtener el último reporte de síntomas web
-    latest_symptoms = db.query(SymptomRecord).filter(SymptomRecord.device_id == device_id).order_by(SymptomRecord.timestamp.desc()).first()
-    
-    if not latest_metric:
-        return {"error": "No hay datos de hardware para este equipo. Corre el agente (main.py) primero."}
+    try:
+        # 1. Obtener la última métrica de hardware
+        latest_metric = db.query(MetricRecord).filter(MetricRecord.device_id == device_id).order_by(MetricRecord.timestamp.desc()).first()
         
-    if not latest_symptoms:
-        return {"error": "No hay datos web para este equipo. Llena el formulario primero."}
+        # 2. Obtener el último reporte de síntomas web
+        latest_symptoms = db.query(SymptomRecord).filter(SymptomRecord.device_id == device_id).order_by(SymptomRecord.timestamp.desc()).first()
+        
+        if not latest_metric:
+            return {"error": "No hay datos de hardware para este equipo. Corre el agente (main.py) primero."}
+            
+        if not latest_symptoms:
+            return {"error": "No hay datos web para este equipo. Llena el formulario primero."}
 
-    # 3. Formatear para el modelo
-    hardware_data = {
-        "cpu": latest_metric.cpu,
-        "ram": latest_metric.ram,
-        "disk": latest_metric.disk,
-        "disk_active": latest_metric.disk_active,
-        "gpu": latest_metric.gpu
-    }
-    
-    symptoms_data = {
-        "is_slow": latest_symptoms.is_slow,
-        "random_restarts": latest_symptoms.random_restarts,
-        "weird_noises": latest_symptoms.weird_noises,
-        "overheating": latest_symptoms.overheating,
-        "bsod_errors": latest_symptoms.bsod_errors,
-        "screen_flicker": latest_symptoms.screen_flicker,
-        "apps_crashing": latest_symptoms.apps_crashing,
-        "battery_issue": latest_symptoms.battery_issue,
-        "burnt_smell": latest_symptoms.burnt_smell,
-        "visual_artifacts": latest_symptoms.visual_artifacts,
-        "system_freezes": latest_symptoms.system_freezes,
-        "usb_disconnects": latest_symptoms.usb_disconnects,
-        "network_drops": latest_symptoms.network_drops,
-        "slow_boot": latest_symptoms.slow_boot,
-        "file_corruption": latest_symptoms.file_corruption
-    }
-    
-    # 4. Importar dinámicamente y predecir
-    import sys
-    import os
-    # Agregar carpeta raíz al path para poder importar desde ML
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from ML.classifier import predict_status_with_proba
-    
-    diagnosis_obj = predict_status_with_proba(hardware_data, symptoms_data)
-    
-    return {
-        "device_id": device_id,
-        "hardware_timestamp": latest_metric.timestamp,
-        "symptoms_timestamp": latest_symptoms.timestamp,
-        "diagnostico_ml": diagnosis_obj["prediction"],
-        "probabilidades": diagnosis_obj["probabilities"],
-        "decision_path": diagnosis_obj["decision_path"]
-    }
+        # 3. Formatear para el modelo
+        hardware_data = {
+            "cpu": latest_metric.cpu,
+            "ram": latest_metric.ram,
+            "disk": latest_metric.disk,
+            "disk_active": latest_metric.disk_active,
+            "gpu": latest_metric.gpu
+        }
+        
+        symptoms_data = {
+            "is_slow": latest_symptoms.is_slow,
+            "random_restarts": latest_symptoms.random_restarts,
+            "weird_noises": latest_symptoms.weird_noises,
+            "overheating": latest_symptoms.overheating,
+            "bsod_errors": latest_symptoms.bsod_errors,
+            "screen_flicker": latest_symptoms.screen_flicker,
+            "apps_crashing": latest_symptoms.apps_crashing,
+            "battery_issue": latest_symptoms.battery_issue,
+            "burnt_smell": latest_symptoms.burnt_smell,
+            "visual_artifacts": latest_symptoms.visual_artifacts,
+            "system_freezes": latest_symptoms.system_freezes,
+            "usb_disconnects": latest_symptoms.usb_disconnects,
+            "network_drops": latest_symptoms.network_drops,
+            "slow_boot": latest_symptoms.slow_boot,
+            "file_corruption": latest_symptoms.file_corruption
+        }
+        
+        # 4. Importar dinámicamente y predecir
+        import sys
+        import os
+        import traceback
+        # Agregar carpeta raíz al path para poder importar desde ML
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from ML.classifier import predict_status_with_proba
+        
+        diagnosis_obj = predict_status_with_proba(hardware_data, symptoms_data)
+        
+        return {
+            "device_id": device_id,
+            "hardware_timestamp": latest_metric.timestamp,
+            "symptoms_timestamp": latest_symptoms.timestamp,
+            "diagnostico_ml": diagnosis_obj["prediction"],
+            "probabilidades": diagnosis_obj["probabilities"],
+            "decision_path": diagnosis_obj["decision_path"]
+        }
+    except Exception as e:
+        import traceback
+        err_str = traceback.format_exc()
+        # Imprimir en consola y retornar en JSON
+        print("\n=== CRITICAL ERROR IN DIAGNOSTICS ===")
+        print(err_str)
+        print("======================================\n")
+        return {"error": f"INTERNAL SERVER ERROR:\n{str(e)}"}
+
 
 @app.get("/api/device-id")
 def get_device_id():
