@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             deviceIdInput.value = "";
             deviceIdInput.placeholder = "Escribe el nombre de tu equipo (Ej. LAPTOP-BRYAN)";
-            deviceIdInput.removeAttribute('readonly'); 
+            deviceIdInput.removeAttribute('readonly');
         }
     }
 
