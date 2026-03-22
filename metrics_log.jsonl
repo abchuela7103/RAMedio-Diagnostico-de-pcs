@@ -381,3 +381,8 @@
 {"device_id": "DESKTOP-EDTV461", "timestamp": "2026-03-21T22:01:26.196546+00:00", "metrics": {"cpu": 2.77, "ram": 59.28, "disk": 74.1, "disk_active": 0.0, "gpu": 0.2, "battery": null}}
 {"device_id": "DESKTOP-EDTV461", "timestamp": "2026-03-21T22:02:36.679839+00:00", "metrics": {"cpu": 1.54, "ram": 59.38, "disk": 74.1, "disk_active": 0.0, "gpu": 0.3, "battery": null}}
 {"device_id": "DESKTOP-EDTV461", "timestamp": "2026-03-21T22:31:25.501632+00:00", "metrics": {"cpu": 4.25, "ram": 60.22, "disk": 74.1, "disk_active": 0.0, "gpu": 0.1, "battery": null}}
+{"device_id": "DESKTOP-EDTV461", "timestamp": "2026-03-22T04:46:37.442914+00:00", "metrics": {"cpu": 1.06, "ram": 6.2, "disk": 7.45, "disk_active": 0.0, "gpu": 0.0, "battery": null}}
+{"device_id": "DESKTOP-EDTV461", "timestamp": "2026-03-22T04:47:42.382506+00:00", "metrics": {"cpu": 1.38, "ram": 12.4, "disk": 14.9, "disk_active": 0.0, "gpu": 0.1, "battery": null}}
+{"device_id": "DESKTOP-EDTV461", "timestamp": "2026-03-22T04:47:46.047944+00:00", "metrics": {"cpu": 1.46, "ram": 18.59, "disk": 22.35, "disk_active": 0.0, "gpu": 0.1, "battery": null}}
+{"device_id": "DESKTOP-EDTV461", "timestamp": "2026-03-22T04:47:49.828326+00:00", "metrics": {"cpu": 1.6, "ram": 24.79, "disk": 29.8, "disk_active": 0.0, "gpu": 0.1, "battery": null}}
+{"device_id": "DESKTOP-EDTV461", "timestamp": "2026-03-22T04:50:56.682279+00:00", "metrics": {"cpu": 5.79, "ram": 61.7, "disk": 74.5, "disk_active": 0.0, "gpu": 5.4, "battery": null}}
