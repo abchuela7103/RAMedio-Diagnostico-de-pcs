@@ -13,63 +13,51 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     window.globalTreeData = null;
     window.treeChartRef = treeChart;
-    let currentPathInterval = null;
 
-    window.animateDecisionPath = function(pathArray) {
+    window.highlightDecisionPath = function(pathArray) {
         if (!window.globalTreeData || !window.treeChartRef) {
-            setTimeout(() => window.animateDecisionPath(pathArray), 500);
+            setTimeout(() => window.highlightDecisionPath(pathArray), 500);
             return;
         }
         const clonedTree = JSON.parse(JSON.stringify(window.globalTreeData));
-        let step = 0;
-        if(currentPathInterval) clearInterval(currentPathInterval);
+        const activeNodes = pathArray;
+        const currentNodeId = pathArray[pathArray.length - 1]; // El nodo final
         
-        currentPathInterval = setInterval(() => {
-            if (step >= pathArray.length) {
-                clearInterval(currentPathInterval);
-                return;
+        function styleNode(node) {
+            if (activeNodes.includes(node.node_id)) {
+                node.itemStyle = Object.assign({}, node.itemStyle || {}, { color: '#ff4757', borderColor: '#ff4757', shadowBlur: 20, shadowColor: '#ff4757' });
+                node.collapsed = false; 
             }
-            const activeNodes = pathArray.slice(0, step + 1);
-            const currentNodeId = pathArray[step];
+            if (node.node_id === currentNodeId) {
+                node.symbolSize = 35;
+                node.itemStyle.color = '#fff';
+                if (!node.label) node.label = {};
+                node.label.color = '#fff';
+                node.label.backgroundColor = '#ff4757';
+                node.label.fontWeight = 'bold';
+                node.label.fontSize = 18;
+            } else if (activeNodes.includes(node.node_id)) {
+                if (!node.label) node.label = {};
+                node.label.color = '#ff4757';
+                node.label.fontWeight = 'bold';
+                node.label.fontSize = 16;
+            }
             
-            function styleNode(node) {
-                if (activeNodes.includes(node.node_id)) {
-                    node.itemStyle = Object.assign({}, node.itemStyle || {}, { color: '#ff4757', borderColor: '#ff4757', shadowBlur: 20, shadowColor: '#ff4757' });
-                    node.collapsed = false; 
-                }
-                if (node.node_id === currentNodeId) {
-                    node.symbolSize = 25;
-                    node.itemStyle.color = '#fff';
-                    if (!node.label) node.label = {};
-                    node.label.color = '#ff4757';
-                    node.label.fontWeight = 'bold';
-                    node.label.fontSize = 16;
-                    
-                    if (step === pathArray.length - 1) { // Final Leaf
-                        node.label.fontSize = 18;
-                        node.label.backgroundColor = '#ff4757';
-                        node.label.color = '#fff';
-                        node.symbolSize = 35;
+            if (node.children) {
+                node.children.forEach(child => {
+                    if (activeNodes.includes(child.node_id)) {
+                        child.lineStyle = { color: '#ff4757', width: 4, type: 'solid', shadowBlur: 10, shadowColor: '#ff4757' };
                     }
-                }
-                if (node.children) {
-                    node.children.forEach(child => {
-                        if (activeNodes.includes(child.node_id)) {
-                            child.lineStyle = { color: '#ff4757', width: 4, type: 'solid', shadowBlur: 10, shadowColor: '#ff4757' };
-                        }
-                        styleNode(child);
-                    });
-                }
+                    styleNode(child);
+                });
             }
-            
-            const frameTree = JSON.parse(JSON.stringify(clonedTree));
-            styleNode(frameTree);
-            
-            window.treeChartRef.setOption({
-                series: [{ type: 'tree', data: [frameTree] }]
-            });
-            step++;
-        }, 800); // 800ms de retraso entre cada nodo!
+        }
+        
+        styleNode(clonedTree);
+        
+        window.treeChartRef.setOption({
+            series: [{ type: 'tree', data: [clonedTree] }]
+        });
     };
 
     // 1. Fetch de los datos del ML (Arbol y Precisión) al cargar la página
@@ -322,9 +310,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 probaChart.setOption(probaOption, true);
                 window.addEventListener('resize', () => probaChart.resize());
                 
-                // Novedad: Ejecutar Animación del path si el backend lo retornó!
+                // Ejecutar Resaltado del path si el backend lo retornó!
                 if(data.decision_path) {
-                    window.animateDecisionPath(data.decision_path);
+                    window.highlightDecisionPath(data.decision_path);
                 }
                 
             } else {

@@ -4,7 +4,7 @@ from sklearn.tree import DecisionTreeClassifier
 import joblib
 import os
 
-def generate_synthetic_data(num_samples=2500):
+def generate_chaotic_synthetic_data(num_samples=15000):
     data = []
     
     features = [
@@ -16,81 +16,113 @@ def generate_synthetic_data(num_samples=2500):
     ]
     
     for _ in range(num_samples):
-        # Base healthy state
-        row = {f: 0 for f in features}
-        row["cpu"] = np.random.uniform(1, 40)
-        row["ram"] = np.random.uniform(20, 60)
-        row["disk"] = np.random.uniform(10, 80)
-        row["disk_active"] = np.random.uniform(0, 5)
-        row["gpu"] = np.random.uniform(0, 15)
+        # Base state (caótico, mucha varianza normal)
+        row = {f: np.random.choice([0, 1], p=[0.9, 0.1]) for f in features[5:]} # Síntomas esporádicos en sistemas sanos
+        row["cpu"] = np.random.normal(30, 15)
+        row["ram"] = np.random.normal(40, 20)
+        row["disk"] = np.random.normal(20, 10)
+        row["disk_active"] = np.random.exponential(5)
+        row["gpu"] = np.random.lognormal(1, 1)
+        
         label = "Sistema Saludable"
         
-        # Inject scenarios manually based on standard PC failure rates
         scenario = np.random.choice([
             "healthy", "thermal_throttling", "gpu_failure", "hdd_failure", 
-            "ram_failure", "psu_mobo_failure", "network_failure", "cpu_bottleneck"
-        ], p=[0.4, 0.1, 0.05, 0.1, 0.1, 0.05, 0.1, 0.1])
+            "ram_failure", "psu_mobo_failure", "network_failure", "cpu_bottleneck",
+            "malware_infection"
+        ], p=[0.3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.05, 0.1, 0.05])
         
         if scenario == "thermal_throttling":
-            row["overheating"] = 1
-            row["cpu"] = np.random.uniform(85, 100)
-            row["gpu"] = np.random.uniform(85, 100)
-            row["is_slow"] = np.random.choice([1, 0])
+            row["overheating"] = np.random.choice([1, 0], p=[0.85, 0.15]) # A veces falla sin reportarse caliente
+            row["cpu"] = np.random.normal(90, 10)
+            row["gpu"] = np.random.normal(80, 20)
+            row["is_slow"] = np.random.choice([1, 0], p=[0.9, 0.1])
+            row["random_restarts"] = np.random.choice([1, 0], p=[0.4, 0.6])
             label = "Degradación Térmica Severa (Sobrecalentamiento)"
             
         elif scenario == "gpu_failure":
-            row["visual_artifacts"] = 1
-            row["screen_flicker"] = np.random.choice([1, 0])
+            row["visual_artifacts"] = np.random.choice([1, 0], p=[0.8, 0.2])
+            row["screen_flicker"] = np.random.choice([1, 0], p=[0.7, 0.3])
+            row["gpu"] = np.random.choice([np.random.normal(95, 5), np.random.normal(0, 5)]) # Picosa o muerta
+            row["apps_crashing"] = np.random.choice([1, 0], p=[0.6, 0.4])
             label = "Falla Crítica de GPU (Artefactos de Video)"
             
         elif scenario == "hdd_failure":
-            row["file_corruption"] = 1
-            row["weird_noises"] = np.random.choice([1, 0])
-            row["disk_active"] = 100.0
+            row["file_corruption"] = np.random.choice([1, 0], p=[0.6, 0.4])
+            row["weird_noises"] = np.random.choice([1, 0], p=[0.75, 0.25])
+            row["disk_active"] = np.random.normal(95, 5) # Disco permanentemente escrito
+            row["slow_boot"] = np.random.choice([1, 0], p=[0.9, 0.1])
             row["is_slow"] = 1
             label = "Falla Inminente de Disco (Corrupción/SMART)"
             
         elif scenario == "ram_failure":
-            row["system_freezes"] = 1
-            row["bsod_errors"] = np.random.choice([1, 0], p=[0.7, 0.3])
-            row["apps_crashing"] = 1
-            row["ram"] = np.random.uniform(90, 100)
-            label = "Defecto en Memoria RAM (Pantallazos Azules)"
+            row["system_freezes"] = np.random.choice([1, 0], p=[0.8, 0.2])
+            row["bsod_errors"] = np.random.choice([1, 0], p=[0.6, 0.4])
+            row["apps_crashing"] = np.random.choice([1, 0], p=[0.7, 0.3])
+            row["ram"] = np.random.normal(95, 5) # Out of memory constante
+            row["is_slow"] = np.random.choice([1, 0], p=[0.7, 0.3])
+            label = "Saturación o Defecto en RAM (BSODs frecuentes)"
             
         elif scenario == "psu_mobo_failure":
-            row["usb_disconnects"] = 1
-            row["random_restarts"] = 1
-            row["burnt_smell"] = np.random.choice([1, 0], p=[0.1, 0.9])
+            row["usb_disconnects"] = np.random.choice([1, 0], p=[0.9, 0.1])
+            row["random_restarts"] = np.random.choice([1, 0], p=[0.8, 0.2])
+            row["burnt_smell"] = np.random.choice([1, 0], p=[0.2, 0.8])
+            row["screen_flicker"] = np.random.choice([1, 0], p=[0.3, 0.7])
             label = "Fallo Eléctrico (Fuente de Poder / Placa Base)"
             
         elif scenario == "network_failure":
-            row["network_drops"] = 1
-            label = "Problema del Controlador de Red (Wi-Fi/Ethernet)"
+            row["network_drops"] = np.random.choice([1, 0], p=[0.95, 0.05])
+            row["is_slow"] = np.random.choice([1, 0], p=[0.3, 0.7])
+            label = "Problema del Adaptador de Red (Wi-Fi/Ethernet)"
             
         elif scenario == "cpu_bottleneck":
-            row["cpu"] = 100.0
+            row["cpu"] = np.random.normal(98, 2)
             row["is_slow"] = 1
-            row["slow_boot"] = np.random.choice([1, 0])
-            label = "Cuello de Botella Máximo en CPU"
+            row["apps_crashing"] = np.random.choice([1, 0], p=[0.3, 0.7])
+            row["slow_boot"] = np.random.choice([1, 0], p=[0.6, 0.4])
+            label = "Cuello de Botella Máximo en Procesador (CPU)"
             
+        elif scenario == "malware_infection":
+            row["cpu"] = np.random.normal(85, 10)
+            row["network_drops"] = np.random.choice([1, 0], p=[0.4, 0.6])
+            row["disk_active"] = np.random.normal(60, 20)
+            row["is_slow"] = 1
+            row["system_freezes"] = np.random.choice([1, 0], p=[0.3, 0.7])
+            label = "Comportamiento Anómalo (Infección de Malware Pts. Alta)"
+            
+        # Limitar para evitar valores ilógicos fuera de 0-100 en hardware
+        row["cpu"] = np.clip(row["cpu"], 0, 100)
+        row["ram"] = np.clip(row["ram"], 0, 100)
+        row["disk"] = np.clip(row["disk"], 0, 100)
+        row["disk_active"] = np.clip(row["disk_active"], 0, 100)
+        row["gpu"] = np.clip(row["gpu"], 0, 100)
+
         row["label"] = label
         data.append(row)
         
     return pd.DataFrame(data)
 
 if __name__ == "__main__":
-    print("Iniciando Generación de Datos Sintéticos para Múltiples Escenarios...")
-    df = generate_synthetic_data()
+    print("Iniciando Generación de Datos Sintéticos CAÓTICOS (15,000 muestras)...")
+    df = generate_chaotic_synthetic_data(15000)
     
     X = df.drop("label", axis=1)
     y = df["label"]
     
-    print("Simulando entorno de entrenamiento con Árboles de Decisión...")
-    model = DecisionTreeClassifier(max_depth=12, random_state=42)
+    print("Entrenando Árbol de Decisión Complejo (Hiper-ramificado)...")
+    # Al aumentar la profundidad máxima y bajar el min_samples, forzamos un árbol ENORME.
+    model = DecisionTreeClassifier(max_depth=20, min_samples_leaf=4, min_samples_split=10, random_state=42)
     model.fit(X, y)
     
-    model_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "ML", "modelo_decision_tree.pkl")
+    # Evaluar complejidad y precisión lograda
+    train_acc = model.score(X, y)
+    print(f"Precisión del Modelo en base ruidosa: {train_acc * 100:.2f}%")
+    print(f"Profundidad real alcanzada: {model.tree_.max_depth} niveles lógicos")
+    print(f"Total de nodos fractales creados: {model.tree_.node_count}")
+    
+    # Usar __file__ para ubicar dinámicamente el proyecto 
+    model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "modelo_decision_tree.pkl")
     joblib.dump(model, model_path)
     
-    print(f"ÉXITO: Modelo guardado en: {model_path}")
-    print("La Inteligencia Artificial ahora predice 8 diagnósticos especializados a partir de 20 variables de salud.")
+    print(f"ÉXITO: Modelo Denso Guardado en {model_path}")
+    print("¡El Dashboard ahora mostrará un árbol de decisión verdaderamente enorme e inescrutable!")

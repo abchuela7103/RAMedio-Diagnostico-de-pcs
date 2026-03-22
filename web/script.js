@@ -7,6 +7,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const resetBtn = document.getElementById('reset-btn');
     const deviceIdInput = document.getElementById('device_id');
 
+    // Novedad: Pre-cargar el árbol para que la animación sea instantánea tras enviar el form
+    let globalTreeDataIndex = null;
+    fetch('https://ramedio-diagnostico-de-pcs.onrender.com/api/ml/tree')
+        .then(res => res.json())
+        .then(data => { globalTreeDataIndex = data.tree; })
+        .catch(err => console.log("Tree no precargado", err));
+
     // Función para auto-detectar Device ID desde URL o caché local
     function fetchDeviceId() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -100,20 +107,94 @@ document.addEventListener('DOMContentLoaded', async () => {
                             diagnosisText.textContent = mlData.error;
                             diagnosisText.style.color = "var(--danger)";
                         } else {
-                            // ¡Éxito! Mostrar el resultado
-                            diagnosisText.textContent = mlData.diagnostico_ml;
+                            // Mostrar la animación del árbol en la página principal
+                            diagnosisText.textContent = "Trazando lógica de Inteligencia Artificial...";
+                            diagnosisText.style.color = "var(--text-primary)";
+                            const treeContainer = document.getElementById('index-tree-chart');
+                            treeContainer.style.display = 'block';
+                            
+                            const idxChart = echarts.init(treeContainer, 'dark');
+                            
+                            if(globalTreeDataIndex && mlData.decision_path) {
+                                idxChart.setOption({
+                                    backgroundColor: 'transparent',
+                                    series: [{
+                                        type: 'tree',
+                                        data: [globalTreeDataIndex],
+                                        top: '2%', left: '8%', bottom: '2%', right: '20%',
+                                        symbolSize: 8, roam: true, initialTreeDepth: 3,
+                                        label: { color: '#fff', fontSize: 13, backgroundColor: 'rgba(0,0,0,0.6)', padding: [3,6], borderRadius: 4 },
+                                        itemStyle: { color: '#1e90ff', borderColor: '#00f2fe' },
+                                        lineStyle: { color: '#555', width: 2, curveness: 0.5 },
+                                        animationDuration: 300,
+                                        animationDurationUpdate: 500
+                                    }]
+                                });
 
-                            // Cambiar color dependiendo de la gravedad (opcional pero bonito)
-                            if (mlData.diagnostico_ml === "Sistema Saludable") {
-                                diagnosisText.style.color = "var(--success)";
+                                const pathArray = mlData.decision_path;
+                                let step = 0;
+                                let clonedTree = JSON.parse(JSON.stringify(globalTreeDataIndex));
+                                
+                                const animationInterval = setInterval(() => {
+                                    if(step >= pathArray.length) {
+                                        clearInterval(animationInterval);
+                                        // Finalizar la animación: presentar veredicto de forma prominente y redirigir
+                                        diagnosisText.textContent = "Veredicto: " + mlData.diagnostico_ml;
+                                        if (mlData.diagnostico_ml === "Sistema Saludable") {
+                                            diagnosisText.style.color = "var(--success)";
+                                        } else {
+                                            diagnosisText.style.color = "#fbbf24";
+                                        }
+                                        
+                                        setTimeout(() => {
+                                            window.location.href = `dashboard.html?device_id=${encodeURIComponent(payload.device_id)}`;
+                                        }, 2500); // 2.5s para que lean el veredicto
+                                        return;
+                                    }
+                                    
+                                    const activeNodes = pathArray.slice(0, step + 1);
+                                    const currentNodeId = pathArray[step];
+                                    
+                                    function styleNode(node) {
+                                        if (activeNodes.includes(node.node_id)) {
+                                            node.itemStyle = Object.assign({}, node.itemStyle || {}, { color: '#ff4757', borderColor: '#ff4757', shadowBlur: 20, shadowColor: '#ff4757' });
+                                            node.collapsed = false; 
+                                        }
+                                        if (node.node_id === currentNodeId) {
+                                            node.symbolSize = 20;
+                                            node.label = Object.assign({}, node.label || {}, { color: '#ff4757', fontWeight: 'bold', fontSize: 15 });
+                                            if (step === pathArray.length - 1) { 
+                                                node.label = Object.assign(node.label, { fontSize: 18, backgroundColor: '#ff4757', color: '#fff' });
+                                                node.symbolSize = 30;
+                                            }
+                                        }
+                                        if (node.children) {
+                                            node.children.forEach(child => {
+                                                if (activeNodes.includes(child.node_id)) {
+                                                    child.lineStyle = { color: '#ff4757', width: 4, type: 'solid', shadowBlur: 10, shadowColor: '#ff4757' };
+                                                }
+                                                styleNode(child);
+                                            });
+                                        }
+                                    }
+                                    
+                                    const frameTree = JSON.parse(JSON.stringify(clonedTree));
+                                    styleNode(frameTree);
+                                    idxChart.setOption({ series: [{ type: 'tree', data: [frameTree] }] });
+                                    step++;
+                                }, 800); // velocidad del tracker
                             } else {
-                                diagnosisText.style.color = "#fbbf24"; // Amarillo advertencia
+                                // Fallback sin animación (por ej. si no cargó el árbol o no llegó el decision_path)
+                                diagnosisText.textContent = mlData.diagnostico_ml;
+                                if (mlData.diagnostico_ml === "Sistema Saludable") {
+                                    diagnosisText.style.color = "var(--success)";
+                                } else {
+                                    diagnosisText.style.color = "#fbbf24";
+                                }
+                                setTimeout(() => {
+                                    window.location.href = `dashboard.html?device_id=${encodeURIComponent(payload.device_id)}`;
+                                }, 1500);
                             }
-
-                            // Redirigir al dashboard para ver los análisis visuales de ML y de Hardware reales
-                            setTimeout(() => {
-                                window.location.href = `dashboard.html?device_id=${encodeURIComponent(payload.device_id)}`;
-                            }, 1500);
                         }
                     } else {
                         diagnosisText.textContent = "Error al calcular diagnóstico.";
