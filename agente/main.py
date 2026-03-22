@@ -93,7 +93,7 @@ def recolectar_metricas(app):
             send_metrics(payload)
             
             # Finalizado con exito
-            app.root.after(0, lambda: app.finalizar_exito())
+            app.root.after(0, lambda data=avg_data: app.finalizar_exito(data))
 
         except Exception as e:
             app.root.after(0, lambda e=e: app.mostrar_error(e))
@@ -234,9 +234,29 @@ class AgenteApp:
         widget.bind("<Enter>", lambda e: widget.config(bg=color_hover))
         widget.bind("<Leave>", lambda e: widget.config(bg=color_normal))
 
-    def finalizar_exito(self):
+    def finalizar_exito(self, metricas):
         self.progress.config(value=100)
         self.lbl_estado.config(text="¡Métricas enviadas correctamente!", fg=SUCCESS_COLOR)
+        
+        # Formatear texto de métricas
+        bat = metricas.get('battery')
+        if bat:
+            bateria_texto = f"{bat['percent']}% ({'Conectado' if bat['power_plugged'] else 'Desconectado'})"
+        else:
+            bateria_texto = "No disponible"
+            
+        texto_metricas = (
+            f"📊 CPU: {metricas['cpu']}%   |   🧠 RAM: {metricas['ram']}%\n"
+            f"💾 Disco: {metricas['disk']}% (Uso Activo: {metricas['disk_active']}%)   |   🎮 GPU: {metricas['gpu']}%\n"
+            f"🔋 Batería: {bateria_texto}"
+        )
+
+        lbl_metricas = tk.Label(
+            self.panel, text=texto_metricas, font=("Helvetica", 11, "bold"), 
+            bg=BG_COLOR, fg=TEXT_MAIN, justify=tk.CENTER, padx=15, pady=8
+        )
+        lbl_metricas.pack(before=self.btn_frame, pady=(0, 20))
+        
         self.btn_iniciar.pack_forget() 
         self.btn_formulario.pack(pady=0) 
 
