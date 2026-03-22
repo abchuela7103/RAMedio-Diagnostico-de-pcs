@@ -259,9 +259,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             const res = await fetch(`https://ramedio-diagnostico-de-pcs.onrender.com/api/diagnostico/${encodeURIComponent(deviceId)}`);
             const data = await res.json();
             
+            // Modificar Título principal y Sugerencia
+            document.getElementById('current-diagnosis-text').textContent = "Veredicto IA: " + data.diagnostico_ml;
+            
+            const solEl = document.getElementById('current-solution-text');
+            if (data.solucion) {
+                solEl.innerHTML = `<strong>💡 Sugerencia:</strong> ${data.solucion}`;
+                solEl.style.display = 'block';
+            } else {
+                solEl.style.display = 'none'; // Hide if no solution
+            }
+            
             if(data.diagnostico_ml && data.probabilidades) {
-                document.getElementById('current-diagnosis-text').textContent = "Veredicto de la IA: " + data.diagnostico_ml;
-                
                 const classes = Object.keys(data.probabilidades);
                 const values = Object.values(data.probabilidades);
                 

@@ -118,19 +118,19 @@ def get_tree_structure():
     model = get_model()
     tree_ = model.tree_
     
-    # Feature names en el mismo orden exacto del entrenamiento y predicción
-    feature_names = [
-        "cpu", "ram", "disk", "disk_active", "gpu",
-        "is_slow", "random_restarts", "weird_noises", "overheating", "bsod_errors",
-        "screen_flicker", "apps_crashing", "battery_issue", "burnt_smell",
-        "visual_artifacts", "system_freezes", "usb_disconnects", "network_drops", 
-        "slow_boot", "file_corruption"
+    # Mapeo a Español estrictamente para la visualización del Árbol (UI)
+    feature_names_es = [
+        "CPU (%)", "RAM (%)", "Uso de Disco (%)", "Disco Activo (%)", "GPU (%)",
+        "Lentitud", "Reinicios Aleatorios", "Ruidos Extraños", "Sobrecalentamiento", "Pantallazos Azules",
+        "Parpadeo", "Cierre Inesperado de Apps", "Falla de Batería", "Olor a Quemado",
+        "Artefactos Visuales", "Congelamiento", "Desconexión de USBs", "Caídas de Red", 
+        "Arranque Lento", "Corrupción de Archivos"
     ]
     class_names = model.classes_
     
     def recurse(node):
         if tree_.feature[node] != _tree.TREE_UNDEFINED:
-            name = feature_names[tree_.feature[node]]
+            name = feature_names_es[tree_.feature[node]]
             threshold = tree_.threshold[node]
             return {
                 "name": f"{name} <= {threshold:.1f}",

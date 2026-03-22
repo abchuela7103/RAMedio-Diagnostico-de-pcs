@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnText = submitBtn.querySelector('span');
     const successMessage = document.getElementById('success-message');
     const resetBtn = document.getElementById('reset-btn');
+    const goDashboardBtn = document.getElementById('go-dashboard-btn');
     const deviceIdInput = document.getElementById('device_id');
 
     // Novedad: Pre-cargar el árbol para que la animación sea instantánea tras enviar el form
@@ -138,17 +139,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 const animationInterval = setInterval(() => {
                                     if(step >= pathArray.length) {
                                         clearInterval(animationInterval);
-                                        // Finalizar la animación: presentar veredicto de forma prominente y redirigir
-                                        diagnosisText.textContent = "Veredicto: " + mlData.diagnostico_ml;
+                                        // Finalizar la animación: presentar veredicto de forma prominente
+                                        diagnosisText.innerHTML = `<strong>Veredicto:</strong> ${mlData.diagnostico_ml}<br><span style="font-size: 0.95em; color: #acc; font-weight: normal; margin-top: 5px; display: inline-block;">💡 ${mlData.solucion}</span>`;
                                         if (mlData.diagnostico_ml === "Sistema Saludable") {
                                             diagnosisText.style.color = "var(--success)";
                                         } else {
                                             diagnosisText.style.color = "#fbbf24";
                                         }
                                         
-                                        setTimeout(() => {
-                                            window.location.href = `dashboard.html?device_id=${encodeURIComponent(payload.device_id)}`;
-                                        }, 2500); // 2.5s para que lean el veredicto
+                                        goDashboardBtn.onclick = () => { window.location.href = `dashboard.html?device_id=${encodeURIComponent(payload.device_id)}`; };
+                                        goDashboardBtn.classList.remove('hidden');
                                         return;
                                     }
                                     
@@ -185,15 +185,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 }, 800); // velocidad del tracker
                             } else {
                                 // Fallback sin animación (por ej. si no cargó el árbol o no llegó el decision_path)
-                                diagnosisText.textContent = mlData.diagnostico_ml;
+                                diagnosisText.innerHTML = `<strong>Veredicto:</strong> ${mlData.diagnostico_ml}<br><span style="font-size: 0.95em; color: #acc; font-weight: normal; margin-top: 5px; display: inline-block;">💡 ${mlData.solucion}</span>`;
                                 if (mlData.diagnostico_ml === "Sistema Saludable") {
                                     diagnosisText.style.color = "var(--success)";
                                 } else {
                                     diagnosisText.style.color = "#fbbf24";
                                 }
-                                setTimeout(() => {
-                                    window.location.href = `dashboard.html?device_id=${encodeURIComponent(payload.device_id)}`;
-                                }, 1500);
+                                goDashboardBtn.onclick = () => { window.location.href = `dashboard.html?device_id=${encodeURIComponent(payload.device_id)}`; };
+                                goDashboardBtn.classList.remove('hidden');
                             }
                         }
                     } else {
@@ -222,6 +221,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     resetBtn.addEventListener('click', () => {
         form.reset();
         successMessage.classList.add('hidden');
+        goDashboardBtn.classList.add('hidden');
         form.classList.remove('hidden');
 
         // Volver a autocompletar el Device ID después del reset

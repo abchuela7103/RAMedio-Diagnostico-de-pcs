@@ -157,12 +157,27 @@ def run_diagnostics(device_id: str, db: Session = Depends(get_db)):
         from ML.classifier import predict_status_with_proba
         
         diagnosis_obj = predict_status_with_proba(hardware_data, symptoms_data)
+        prediction_label = diagnosis_obj["prediction"]
+        
+        # Mapeo de soluciones sugeridas
+        soluciones = {
+            "Sistema Saludable": "No es necesario realizar ninguna acción preventiva. El equipo funciona óptimamente.",
+            "Degradación Térmica Severa (Sobrecalentamiento)": "Solución: Limpiar ventiladores y disipadores, cambiar pasta térmica del procesador/GPU y verificar flujo de aire del gabinete.",
+            "Falla Crítica de GPU (Artefactos de Video)": "Solución: Actualizar drivers de video. Si persiste, revisar temperaturas de la tarjeta gráfica o considerar un reemplazo por daño de hardware (VRAM).",
+            "Falla Inminente de Disco (Corrupción/SMART)": "Solución URGENTE: Realizar respaldo (backup) inmediato de todos los archivos importantes. Reemplazar la unidad de almacenamiento por una nueva (preferiblemente SSD).",
+            "Saturación o Defecto en RAM (BSODs frecuentes)": "Solución: Ejecutar 'Diagnóstico de memoria de Windows' (mdsched). Limpiar los pines de las memorias RAM con goma de borrar. Si falla, reemplazar el módulo de memoria defectuoso.",
+            "Fallo Eléctrico (Fuente de Poder / Placa Base)": "Solución: Evitar forzar el encendido. Probar el equipo con otra fuente de poder (PSU) de mayor certificación. Revisar capacitores hinchados en la placa base.",
+            "Problema del Adaptador de Red (Wi-Fi/Ethernet)": "Solución: Actualizar o reinstalar drivers de red. Reiniciar el módem/router. Si es físico, usar un adaptador Wi-Fi/Ethernet por USB temporalmente.",
+            "Cuello de Botella Máximo en Procesador (CPU)": "Solución: Cerrar procesos en segundo plano innecesarios desde el Administrador de tareas. Escanear por malware minero. Considerar hacer un upgrade de CPU si el uso al 100% es constante.",
+            "Comportamiento Anómalo (Infección de Malware Pts. Alta)": "Solución: Desconectar de internet inmediatamente. Realizar un análisis profundo con Windows Defender o un antivirus confiable como Malwarebytes."
+        }
         
         return {
             "device_id": device_id,
             "hardware_timestamp": latest_metric.timestamp,
             "symptoms_timestamp": latest_symptoms.timestamp,
-            "diagnostico_ml": diagnosis_obj["prediction"],
+            "diagnostico_ml": prediction_label,
+            "solucion": soluciones.get(prediction_label, "Se requiere revisión técnica detallada."),
             "probabilidades": diagnosis_obj["probabilities"],
             "decision_path": diagnosis_obj["decision_path"]
         }
