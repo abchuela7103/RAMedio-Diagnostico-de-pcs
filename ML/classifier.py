@@ -94,6 +94,8 @@ def predict_status_with_proba(hardware_metrics: dict, symptoms_data: dict) -> di
 
     prediction = model.predict(input_data)[0]
     probas = model.predict_proba(input_data)[0]
+    node_indicator = model.decision_path(input_data)
+    decision_path = [int(idx) for idx in node_indicator.indices]
     
     prob_dict = {}
     for cl_name, prob in zip(model.classes_, probas):
@@ -102,7 +104,8 @@ def predict_status_with_proba(hardware_metrics: dict, symptoms_data: dict) -> di
             
     return {
         "prediction": prediction,
-        "probabilities": prob_dict
+        "probabilities": prob_dict,
+        "decision_path": decision_path
     }
 
 def get_tree_structure():
@@ -126,6 +129,7 @@ def get_tree_structure():
             threshold = tree_.threshold[node]
             return {
                 "name": f"{name} <= {threshold:.1f}",
+                "node_id": int(node),
                 "children": [
                     recurse(tree_.children_left[node]),
                     recurse(tree_.children_right[node])
@@ -134,7 +138,7 @@ def get_tree_structure():
         else:
             value = tree_.value[node][0]
             class_id = np.argmax(value)
-            return {"name": f"-> {class_names[class_id]}", "value": int(value[class_id])}
+            return {"name": f"-> {class_names[class_id]}", "value": int(value[class_id]), "node_id": int(node)}
 
     return recurse(0)
 

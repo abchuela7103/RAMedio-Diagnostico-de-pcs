@@ -161,7 +161,8 @@ def run_diagnostics(device_id: str, db: Session = Depends(get_db)):
         "hardware_timestamp": latest_metric.timestamp,
         "symptoms_timestamp": latest_symptoms.timestamp,
         "diagnostico_ml": diagnosis_obj["prediction"],
-        "probabilidades": diagnosis_obj["probabilities"]
+        "probabilidades": diagnosis_obj["probabilities"],
+        "decision_path": diagnosis_obj["decision_path"]
     }
 
 @app.get("/api/device-id")
