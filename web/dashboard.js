@@ -199,24 +199,105 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    // 3. Fetch y Renderización de Probabilidades ML a petición
+    const loadProbas = async (deviceId) => {
+        const probaDom = document.getElementById('proba-chart');
+        const probaChart = echarts.init(probaDom, 'dark');
+        probaChart.showLoading({text: 'Calculando probabilidades...', color: '#4facfe', maskColor: 'rgba(0,0,0,0.4)'});
+        
+        try {
+            const res = await fetch(`http://localhost:8000/api/diagnostico/${encodeURIComponent(deviceId)}`);
+            const data = await res.json();
+            
+            if(data.diagnostico_ml && data.probabilidades) {
+                document.getElementById('current-diagnosis-text').textContent = "Veredicto de la IA: " + data.diagnostico_ml;
+                
+                const classes = Object.keys(data.probabilidades);
+                const values = Object.values(data.probabilidades);
+                
+                const probaOption = {
+                    backgroundColor: transparentBg,
+                    tooltip: { 
+                        trigger: 'axis', 
+                        axisPointer: { type: 'shadow' },
+                        formatter: '{b}: {c}%' 
+                    },
+                    grid: { left: '3%', right: '10%', bottom: '3%', containLabel: true },
+                    xAxis: { 
+                        type: 'value', 
+                        max: 100, 
+                        axisLabel: { formatter: '{value}%', color: '#aaa' },
+                        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } }
+                    },
+                    yAxis: { 
+                        type: 'category', 
+                        data: classes, 
+                        axisLabel: { color: '#ddd', fontSize: 13, width: 200, overflow: 'break' } 
+                    },
+                    series: [
+                        {
+                            name: 'Probabilidad',
+                            type: 'bar',
+                            data: values,
+                            barWidth: '50%',
+                            itemStyle: {
+                                color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                                    { offset: 0, color: '#00f2fe' },
+                                    { offset: 1, color: '#4facfe' }
+                                ]),
+                                borderRadius: [0, 5, 5, 0]
+                            },
+                            label: { 
+                                show: true, 
+                                position: 'right', 
+                                formatter: '{c}%', 
+                                color: '#fff',
+                                fontWeight: 'bold'
+                            }
+                        }
+                    ]
+                };
+                probaChart.setOption(probaOption, true);
+                window.addEventListener('resize', () => probaChart.resize());
+                
+            } else {
+                document.getElementById('current-diagnosis-text').textContent = "No hay diagnóstico disponible. Llena el formulario primero.";
+            }
+        } catch(err) {
+            console.error("Error cargando probabilidades ML:", err);
+            document.getElementById('current-diagnosis-text').textContent = "Error de conexión con el servidor ML.";
+        } finally {
+            probaChart.hideLoading();
+        }
+    };
+
     // Listeners del HTML
     document.getElementById('load_metrics_btn').addEventListener('click', () => {
         const devId = document.getElementById('dashboard_device_id').value.trim();
         if(devId) {
             loadHardware(devId);
+            loadProbas(devId);
         } else {
             alert('Por favor ingresa un ID de equipo.');
         }
     });
 
     // Petición inicial vacía u opcional de hardware.
-    // Opcional: Para efecto visual bonito de carga, la gráfica hardware inicia limpia
     hardwareChart.setOption({
         backgroundColor: transparentBg,
         title: { text: "Esperando ID de Dispositivo...", textStyle: { color: "#555" }, left: 'center', top:'center' }
     });
 
-    // Hacer todos los gráficos responsivos
+    // Auto-Cargar si venimos redireccionados desde el formulario (index.html)
+    const urlParams = new URLSearchParams(window.location.search);
+    const originDeviceId = urlParams.get('device_id');
+    if (originDeviceId) {
+        document.getElementById('dashboard_device_id').value = originDeviceId;
+        loadHardware(originDeviceId);
+        loadProbas(originDeviceId);
+    }
+
+    // Hacer todos los gráficos responsivos comunes
     window.addEventListener('resize', () => {
         hardwareChart.resize();
         accuracyChart.resize();

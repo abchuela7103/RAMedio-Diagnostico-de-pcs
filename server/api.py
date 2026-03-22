@@ -152,15 +152,16 @@ def run_diagnostics(device_id: str, db: Session = Depends(get_db)):
     import os
     # Agregar carpeta raíz al path para poder importar desde ML
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from ML.classifier import predict_status
+    from ML.classifier import predict_status_with_proba
     
-    diagnosis = predict_status(hardware_data, symptoms_data)
+    diagnosis_obj = predict_status_with_proba(hardware_data, symptoms_data)
     
     return {
         "device_id": device_id,
         "hardware_timestamp": latest_metric.timestamp,
         "symptoms_timestamp": latest_symptoms.timestamp,
-        "diagnostico_ml": diagnosis
+        "diagnostico_ml": diagnosis_obj["prediction"],
+        "probabilidades": diagnosis_obj["probabilities"]
     }
 
 @app.get("/api/device-id")

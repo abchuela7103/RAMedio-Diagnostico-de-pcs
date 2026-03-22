@@ -109,6 +109,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                             } else {
                                 diagnosisText.style.color = "#fbbf24"; // Amarillo advertencia
                             }
+
+                            // Redirigir al dashboard para ver los análisis visuales de ML y de Hardware reales
+                            setTimeout(() => {
+                                window.location.href = `dashboard.html?device_id=${encodeURIComponent(payload.device_id)}`;
+                            }, 1500);
                         }
                     } else {
                         diagnosisText.textContent = "Error al calcular diagnóstico.";

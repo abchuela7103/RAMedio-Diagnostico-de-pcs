@@ -61,6 +61,50 @@ def predict_status(hardware_metrics: dict, symptoms_data: dict) -> str:
     # Retornar el primer (y único) elemento de la predicción
     return prediction[0]
 
+def predict_status_with_proba(hardware_metrics: dict, symptoms_data: dict) -> dict:
+    """Retorna tanto la predicción de texto como el diccionario de probabilidades."""
+    try:
+        model = get_model()
+    except FileNotFoundError as e:
+        return {"prediction": f"Error: {str(e)}", "probabilities": {}}
+
+    input_data = pd.DataFrame([{
+        "cpu": hardware_metrics.get("cpu", 0.0) or 0.0,
+        "ram": hardware_metrics.get("ram", 0.0) or 0.0,
+        "disk": hardware_metrics.get("disk", 0.0) or 0.0,
+        "disk_active": hardware_metrics.get("disk_active", 0.0) or 0.0,
+        "gpu": hardware_metrics.get("gpu", 0.0) or 0.0,
+        
+        "is_slow": 1 if symptoms_data.get("is_slow") else 0,
+        "random_restarts": 1 if symptoms_data.get("random_restarts") else 0,
+        "weird_noises": 1 if symptoms_data.get("weird_noises") else 0,
+        "overheating": 1 if symptoms_data.get("overheating") else 0,
+        "bsod_errors": 1 if symptoms_data.get("bsod_errors") else 0,
+        "screen_flicker": 1 if symptoms_data.get("screen_flicker") else 0,
+        "apps_crashing": 1 if symptoms_data.get("apps_crashing") else 0,
+        "battery_issue": 1 if symptoms_data.get("battery_issue") else 0,
+        "burnt_smell": 1 if symptoms_data.get("burnt_smell") else 0,
+        "visual_artifacts": 1 if symptoms_data.get("visual_artifacts") else 0,
+        "system_freezes": 1 if symptoms_data.get("system_freezes") else 0,
+        "usb_disconnects": 1 if symptoms_data.get("usb_disconnects") else 0,
+        "network_drops": 1 if symptoms_data.get("network_drops") else 0,
+        "slow_boot": 1 if symptoms_data.get("slow_boot") else 0,
+        "file_corruption": 1 if symptoms_data.get("file_corruption") else 0,
+    }])
+
+    prediction = model.predict(input_data)[0]
+    probas = model.predict_proba(input_data)[0]
+    
+    prob_dict = {}
+    for cl_name, prob in zip(model.classes_, probas):
+        if prob > 0:
+            prob_dict[cl_name] = round(prob * 100, 2)
+            
+    return {
+        "prediction": prediction,
+        "probabilities": prob_dict
+    }
+
 def get_tree_structure():
     """Convierte el árbol de decisión de sklearn a un formato JSON (diccionario) para ECharts."""
     model = get_model()
