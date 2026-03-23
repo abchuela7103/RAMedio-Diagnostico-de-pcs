@@ -31,8 +31,8 @@ After=network.target
 
 [Service]
 User=$CURRENT_USER
-WorkingDirectory=$CURRENT_DIR
-ExecStart=$CURRENT_DIR/.venv/bin/uvicorn server.api:app --host 0.0.0.0 --port 80
+WorkingDirectory=$CURRENT_DIR/server
+ExecStart=$CURRENT_DIR/.venv/bin/uvicorn api:app --host 0.0.0.0 --port 80
 Restart=always
 Environment="PATH=$CURRENT_DIR/.venv/bin"
 
