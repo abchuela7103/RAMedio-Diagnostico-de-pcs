@@ -19,7 +19,27 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 # 4. Configurar Systemd Service
-echo "4. Configurando servicio de Systemd..."
+echo "4. Configurando servicio de Systemd dinámicamente..."
+
+CURRENT_DIR=$(pwd)
+CURRENT_USER=$(whoami)
+
+cat <<EOF > ramedio.service
+[Unit]
+Description=RAMedio FastAPI Server
+After=network.target
+
+[Service]
+User=$CURRENT_USER
+WorkingDirectory=$CURRENT_DIR
+ExecStart=$CURRENT_DIR/.venv/bin/uvicorn server.api:app --host 0.0.0.0 --port 80
+Restart=always
+Environment="PATH=$CURRENT_DIR/.venv/bin"
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
 sudo cp ramedio.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable ramedio.service
