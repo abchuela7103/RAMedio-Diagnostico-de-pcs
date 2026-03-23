@@ -270,7 +270,7 @@ class AgenteApp:
         messagebox.showerror("Error", f"Ocurrió un error:\n{str(e)}")
 
     def abrir_formulario(self):
-        url_formulario = f"https://ramedio.onrender.com/?device_id={device_id}"
+        url_formulario = f"http://40.233.30.180/?device_id={device_id}"
         webbrowser.open(url_formulario)
         self.root.destroy()
 

@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         treeChart.showLoading({text: 'Cargando IA...', color: '#4facfe', maskColor: 'rgba(0,0,0,0.4)'});
         accuracyChart.showLoading({text: '', maskColor: 'rgba(0,0,0,0.4)'});
         
-        const mlResponse = await fetch('https://ramedio-diagnostico-de-pcs.onrender.com/api/ml/tree');
+        const mlResponse = await fetch('http://40.233.30.180/api/ml/tree');
         if (mlResponse.ok) {
             const mlData = await mlResponse.json();
             
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         hardwareChart.showLoading({text: 'Consultando Dispositivo...', color: '#4facfe', textColor: '#fff', maskColor: 'rgba(0,0,0,0.4)'});
         
         try {
-            const res = await fetch(`https://ramedio-diagnostico-de-pcs.onrender.com/api/dashboard/history/${encodeURIComponent(deviceId)}`);
+            const res = await fetch(`http://40.233.30.180/api/dashboard/history/${encodeURIComponent(deviceId)}`);
             const data = await res.json();
             
             if(data.timestamps && data.timestamps.length > 0) {
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         probaChart.showLoading({text: 'Calculando probabilidades...', color: '#4facfe', maskColor: 'rgba(0,0,0,0.4)'});
         
         try {
-            const res = await fetch(`https://ramedio-diagnostico-de-pcs.onrender.com/api/diagnostico/${encodeURIComponent(deviceId)}`);
+            const res = await fetch(`http://40.233.30.180/api/diagnostico/${encodeURIComponent(deviceId)}`);
             const data = await res.json();
             
             // Modificar Título principal y Sugerencia
