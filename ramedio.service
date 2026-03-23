@@ -1,0 +1,18 @@
+[Unit]
+Description=RAMedio FastAPI Server
+After=network.target
+
+[Service]
+# Asume que el usuario de Oracle Cloud por defecto es ubuntu
+# Si usas Oracle Linux, cambia esto a 'opc'
+User=ubuntu
+# Asume que clonaste el repo en la raíz del usuario ubuntu
+WorkingDirectory=/home/ubuntu/RAMedio-Diagnostico-de-pcs
+# Ruta completa para ejecutar uvicorn dentro del entorno virtual
+ExecStart=/home/ubuntu/RAMedio-Diagnostico-de-pcs/.venv/bin/uvicorn server.api:app --host 0.0.0.0 --port 80
+Restart=always
+# Limitar accesos si es necesario, pero mantenerlo simple
+Environment="PATH=/home/ubuntu/RAMedio-Diagnostico-de-pcs/.venv/bin"
+
+[Install]
+WantedBy=multi-user.target

@@ -238,3 +238,13 @@ def check_metrics_status(device_id: str, db: Session = Depends(get_db)):
         return {"has_metrics": False, "reason": "Las métricas están caducadas (más de 1 hora). Vuelve a iniciar el agente."}
         
     return {"has_metrics": True}
+
+# -----------------
+# SERVIR FRONTEND WEB
+# -----------------
+import os
+from fastapi.staticfiles import StaticFiles
+
+# Configurar para servir los archivos estáticos del dashboard web en la raíz del dominio
+web_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "web")
+app.mount("/", StaticFiles(directory=web_path, html=True), name="static")
