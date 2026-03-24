@@ -365,6 +365,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(devId) {
             loadHardware(devId);
             loadProbas(devId);
+            localStorage.setItem('ramedio_real_device_id', devId);
+            document.getElementById('return-link').href = `index.html?device_id=${encodeURIComponent(devId)}`;
         } else {
             alert('Por favor ingresa un ID de equipo.');
         }
@@ -383,6 +385,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('dashboard_device_id').value = originDeviceId;
         loadHardware(originDeviceId);
         loadProbas(originDeviceId);
+        localStorage.setItem('ramedio_real_device_id', originDeviceId);
+        const returnLink = document.getElementById('return-link');
+        if (returnLink) {
+            returnLink.href = `index.html?device_id=${encodeURIComponent(originDeviceId)}`;
+        }
     }
 
     // Hacer todos los gráficos responsivos comunes

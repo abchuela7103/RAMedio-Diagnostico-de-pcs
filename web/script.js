@@ -37,6 +37,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Bloquear permanentemente su edición para respetar la auto-detección
         deviceIdInput.placeholder = "Detectando ID del equipo...";
         deviceIdInput.setAttribute('readonly', 'true');
+        deviceIdInput.style.pointerEvents = 'none';
+        deviceIdInput.style.opacity = '0.7';
     }
 
     // Llamar a la función al cargar la página

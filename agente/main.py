@@ -109,8 +109,8 @@ class AgenteApp:
         self.root = root
         self.root.title("RAMedio - Agente de Diagnóstico")
         
-        # Poner la aplicación en Fullscreen
-        self.root.attributes("-fullscreen", True)
+        # Tamaño de ventana (no fullscreen pero grande)
+        self.root.geometry("1100x750")
         self.root.configure(bg=BG_COLOR)
 
         # Por seguridad y UX, permitir salir con Escape
@@ -272,7 +272,6 @@ class AgenteApp:
     def abrir_formulario(self):
         url_formulario = f"http://40.233.30.180/?device_id={device_id}"
         webbrowser.open(url_formulario)
-        self.root.destroy()
 
 if __name__ == "__main__":
     root = tk.Tk()
