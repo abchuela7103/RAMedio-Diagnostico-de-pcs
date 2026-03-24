@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 import json
 
-from .database import engine, get_db, Base
-from .models import MetricRecord, SymptomRecord
+from database import engine, get_db, Base
+from models import MetricRecord, SymptomRecord
 
 # Inicializar Base de datos y crear tablas si no existen
 Base.metadata.create_all(bind=engine)
