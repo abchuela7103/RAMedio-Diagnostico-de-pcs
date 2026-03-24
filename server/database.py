@@ -20,8 +20,8 @@ if DB_USER and DB_PASSWORD and DB_HOST and DB_NAME:
     engine = create_engine(SQLALCHEMY_DATABASE_URL)
 else:
     # Fallback automático a SQLite local para desarrollo rápido
-    print("⚠️  Advertencia: No se encontraron credenciales de Postgres completas en .env")
-    print("🛠️  Usando base de datos SQLite local (ramedio.db) como fallback.")
+    print("Advertencia: No se encontraron credenciales de Postgres completas en .env")
+    print("Usando base de datos SQLite local (ramedio.db) como fallback.")
     SQLALCHEMY_DATABASE_URL = "sqlite:///./ramedio.db"
     # El argumento 'check_same_thread' solo es necesario para SQLite
     engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
