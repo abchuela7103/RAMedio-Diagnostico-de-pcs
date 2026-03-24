@@ -124,30 +124,6 @@ class AgenteApp:
         self.orbs = []
         self.crear_orbes()
 
-        # Botón para cerrar (X) circular al centro arriba en el Canvas principal
-        self.canvas_cerrar = tk.Canvas(
-            self.bg_canvas, width=50, height=50, bg=BG_COLOR, highlightthickness=0, cursor="hand2"
-        )
-        self.canvas_cerrar.place(relx=0.5, rely=0.03, anchor=tk.N)
-        
-        self.circulo = self.canvas_cerrar.create_oval(2, 2, 48, 48, fill=BG_COLOR, outline=TEXT_MUTED, width=2)
-        self.texto_x = self.canvas_cerrar.create_text(25, 25, text="✕", fill=TEXT_MUTED, font=("Helvetica", 14, "bold"))
-        
-        def on_enter_cerrar(e):
-            self.canvas_cerrar.itemconfig(self.circulo, fill=ERROR_COLOR, outline=ERROR_COLOR)
-            self.canvas_cerrar.itemconfig(self.texto_x, fill="white")
-            
-        def on_leave_cerrar(e):
-            self.canvas_cerrar.itemconfig(self.circulo, fill=BG_COLOR, outline=TEXT_MUTED)
-            self.canvas_cerrar.itemconfig(self.texto_x, fill=TEXT_MUTED)
-            
-        def on_click_cerrar(e):
-            self.root.destroy()
-
-        self.canvas_cerrar.bind("<Enter>", on_enter_cerrar)
-        self.canvas_cerrar.bind("<Leave>", on_leave_cerrar)
-        self.canvas_cerrar.bind("<Button-1>", on_click_cerrar)
-
         # Main Panel
         self.panel = tk.Frame(self.bg_canvas, bg=PANEL_COLOR, bd=0, highlightthickness=2, highlightbackground=BTN_PRIMARY)
         self.panel.place(relx=0.5, rely=0.5, anchor=tk.CENTER, width=700, height=450)
@@ -249,8 +225,10 @@ class AgenteApp:
             bateria_texto = "No disponible"
             
         texto_metricas = (
-            f"📊 CPU: {metricas['cpu']}%   |   🧠 RAM: {metricas['ram']}%\n"
-            f"💾 Disco: {metricas['disk']}% (Uso Activo: {metricas['disk_active']}%)   |   🎮 GPU: {metricas['gpu']}%\n"
+            f"📊 CPU: {metricas['cpu']}%\n"
+            f"🧠 RAM: {metricas['ram']}%\n"
+            f"💾 Disco: {metricas['disk']}% (Uso Activo: {metricas['disk_active']}%)\n"
+            f"🎮 GPU: {metricas['gpu']}%\n"
             f"🔋 Batería: {bateria_texto}"
         )
 
