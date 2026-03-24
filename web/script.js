@@ -19,19 +19,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     function fetchDeviceId() {
         const urlParams = new URLSearchParams(window.location.search);
         const urlId = urlParams.get('device_id');
-        const cachedId = localStorage.getItem('ramedio_device_id');
+        let realId = localStorage.getItem('ramedio_real_device_id');
 
+        // Si la URL provee el equipo actual, guardarlo firmemente en caché
         if (urlId) {
-            deviceIdInput.value = urlId;
-            deviceIdInput.setAttribute('readonly', 'true');
-        } else if (cachedId) {
-            deviceIdInput.value = cachedId;
-            // No readonly so they can clear it if they want
+            localStorage.setItem('ramedio_real_device_id', urlId);
+            realId = urlId;
+        }
+
+        // Siempre cargar el ID real detectado al recargar index.html
+        if (realId) {
+            deviceIdInput.value = realId;
         } else {
             deviceIdInput.value = "";
-            deviceIdInput.placeholder = "Escribe el nombre de tu equipo (Ej. LAPTOP-BRYAN)";
-            deviceIdInput.removeAttribute('readonly');
         }
+        
+        // Bloquear permanentemente su edición para respetar la auto-detección
+        deviceIdInput.placeholder = "Detectando ID del equipo...";
+        deviceIdInput.setAttribute('readonly', 'true');
     }
 
     // Llamar a la función al cargar la página
