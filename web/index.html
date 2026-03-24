@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,13 +8,14 @@
     <!-- Modern Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    
+
     <!-- Apache ECharts para la Animación Frontal -->
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
 </head>
+
 <body>
     <div class="background-animation"></div>
-    
+
     <main class="container glass-panel">
         <header>
             <div class="logo-container">
@@ -26,7 +28,8 @@
         <form id="diagnosis-form">
             <section class="form-group primary-input">
                 <label for="device_id">ID del Equipo (Auto-Detectado) <span class="required">*</span></label>
-                <input type="text" id="device_id" name="device_id" placeholder="Detectando ID del equipo..." readonly required>
+                <input type="text" id="device_id" name="device_id" placeholder="Detectando ID del equipo..." readonly
+                    required>
                 <small>Este ID vincula tu reporte con los datos de hardware enviados por el agente RAMedio.</small>
             </section>
 
@@ -42,7 +45,7 @@
                         <div class="radio-group">
                             <input type="radio" id="slow_yes" name="is_slow" value="true" required>
                             <label for="slow_yes" class="radio-btn">Sí</label>
-                            
+
                             <input type="radio" id="slow_no" name="is_slow" value="false">
                             <label for="slow_no" class="radio-btn">No</label>
                         </div>
@@ -54,7 +57,7 @@
                         <div class="radio-group">
                             <input type="radio" id="restart_yes" name="random_restarts" value="true" required>
                             <label for="restart_yes" class="radio-btn">Sí</label>
-                            
+
                             <input type="radio" id="restart_no" name="random_restarts" value="false">
                             <label for="restart_no" class="radio-btn">No</label>
                         </div>
@@ -66,7 +69,7 @@
                         <div class="radio-group">
                             <input type="radio" id="noise_yes" name="weird_noises" value="true" required>
                             <label for="noise_yes" class="radio-btn">Sí</label>
-                            
+
                             <input type="radio" id="noise_no" name="weird_noises" value="false">
                             <label for="noise_no" class="radio-btn">No</label>
                         </div>
@@ -78,7 +81,7 @@
                         <div class="radio-group">
                             <input type="radio" id="hot_yes" name="overheating" value="true" required>
                             <label for="hot_yes" class="radio-btn">Sí</label>
-                            
+
                             <input type="radio" id="hot_no" name="overheating" value="false">
                             <label for="hot_no" class="radio-btn">No</label>
                         </div>
@@ -90,7 +93,7 @@
                         <div class="radio-group">
                             <input type="radio" id="bsod_yes" name="bsod_errors" value="true" required>
                             <label for="bsod_yes" class="radio-btn">Sí</label>
-                            
+
                             <input type="radio" id="bsod_no" name="bsod_errors" value="false">
                             <label for="bsod_no" class="radio-btn">No</label>
                         </div>
@@ -102,7 +105,7 @@
                         <div class="radio-group">
                             <input type="radio" id="flicker_yes" name="screen_flicker" value="true" required>
                             <label for="flicker_yes" class="radio-btn">Sí</label>
-                            
+
                             <input type="radio" id="flicker_no" name="screen_flicker" value="false">
                             <label for="flicker_no" class="radio-btn">No</label>
                         </div>
@@ -114,7 +117,7 @@
                         <div class="radio-group">
                             <input type="radio" id="apps_yes" name="apps_crashing" value="true" required>
                             <label for="apps_yes" class="radio-btn">Sí</label>
-                            
+
                             <input type="radio" id="apps_no" name="apps_crashing" value="false">
                             <label for="apps_no" class="radio-btn">No</label>
                         </div>
@@ -126,7 +129,7 @@
                         <div class="radio-group">
                             <input type="radio" id="bat_yes" name="battery_issue" value="true" required>
                             <label for="bat_yes" class="radio-btn">Sí</label>
-                            
+
                             <input type="radio" id="bat_no" name="battery_issue" value="false">
                             <label for="bat_no" class="radio-btn">No</label>
                         </div>
@@ -138,7 +141,7 @@
                         <div class="radio-group">
                             <input type="radio" id="smell_yes" name="burnt_smell" value="true" required>
                             <label for="smell_yes" class="radio-btn">Sí</label>
-                            
+
                             <input type="radio" id="smell_no" name="burnt_smell" value="false">
                             <label for="smell_no" class="radio-btn">No</label>
                         </div>
@@ -146,11 +149,12 @@
 
                     <!-- Q10 -->
                     <div class="question-card">
-                        <label>10. ¿Aparecen cuadros de colores, líneas o la pantalla se deforma al jugar o ver videos?</label>
+                        <label>10. ¿Aparecen cuadros de colores, líneas o la pantalla se deforma al jugar o ver
+                            videos?</label>
                         <div class="radio-group">
                             <input type="radio" id="art_yes" name="visual_artifacts" value="true" required>
                             <label for="art_yes" class="radio-btn">Sí</label>
-                            
+
                             <input type="radio" id="art_no" name="visual_artifacts" value="false">
                             <label for="art_no" class="radio-btn">No</label>
                         </div>
@@ -162,7 +166,7 @@
                         <div class="radio-group">
                             <input type="radio" id="freeze_yes" name="system_freezes" value="true" required>
                             <label for="freeze_yes" class="radio-btn">Sí</label>
-                            
+
                             <input type="radio" id="freeze_no" name="system_freezes" value="false">
                             <label for="freeze_no" class="radio-btn">No</label>
                         </div>
@@ -174,7 +178,7 @@
                         <div class="radio-group">
                             <input type="radio" id="usb_yes" name="usb_disconnects" value="true" required>
                             <label for="usb_yes" class="radio-btn">Sí</label>
-                            
+
                             <input type="radio" id="usb_no" name="usb_disconnects" value="false">
                             <label for="usb_no" class="radio-btn">No</label>
                         </div>
@@ -186,7 +190,7 @@
                         <div class="radio-group">
                             <input type="radio" id="net_yes" name="network_drops" value="true" required>
                             <label for="net_yes" class="radio-btn">Sí</label>
-                            
+
                             <input type="radio" id="net_no" name="network_drops" value="false">
                             <label for="net_no" class="radio-btn">No</label>
                         </div>
@@ -198,7 +202,7 @@
                         <div class="radio-group">
                             <input type="radio" id="boot_yes" name="slow_boot" value="true" required>
                             <label for="boot_yes" class="radio-btn">Sí</label>
-                            
+
                             <input type="radio" id="boot_no" name="slow_boot" value="false">
                             <label for="boot_no" class="radio-btn">No</label>
                         </div>
@@ -206,11 +210,12 @@
 
                     <!-- Q15 -->
                     <div class="question-card">
-                        <label>15. ¿Se han dañado archivos misteriosamente o Windows pide revisar el disco al encender?</label>
+                        <label>15. ¿Se han dañado archivos misteriosamente o Windows pide revisar el disco al
+                            encender?</label>
                         <div class="radio-group">
                             <input type="radio" id="corr_yes" name="file_corruption" value="true" required>
                             <label for="corr_yes" class="radio-btn">Sí</label>
-                            
+
                             <input type="radio" id="corr_no" name="file_corruption" value="false">
                             <label for="corr_no" class="radio-btn">No</label>
                         </div>
@@ -223,11 +228,11 @@
                 <div class="loader hidden"></div>
             </button>
         </form>
-        
+
         <div id="success-message" class="hidden">
             <div class="success-icon">✓</div>
             <h3>¡Datos Registrados!</h3>
-            
+
             <div id="diagnosis-box" class="diagnosis-box hidden">
                 <h4>Diagnóstico de tu equipo</h4>
                 <p id="diagnosis-text" class="diagnosis-text">Analizando...</p>
@@ -235,12 +240,15 @@
             </div>
 
             <div class="actions-group" style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-                <button id="go-dashboard-btn" class="submit-btn hidden" style="margin: 0; font-size: 0.9rem;">Ver Detalles en el Dashboard</button>
-                <button id="reset-btn" class="secondary-btn" style="margin: 0; padding: 0.8rem 1.5rem; font-size: 0.9rem;">Enviar otro reporte</button>
+                <button id="go-dashboard-btn" class="submit-btn hidden" style="margin: 0; font-size: 0.9rem;">Ver
+                    Detalles en el Dashboard</button>
+                <button id="reset-btn" class="secondary-btn"
+                    style="margin: 0; padding: 0.8rem 1.5rem; font-size: 0.9rem;">Enviar otro reporte</button>
             </div>
         </div>
     </main>
 
-    <script src="script.js?v=2"></script>
+    <script src="script.js?v=4"></script>
 </body>
+
 </html>

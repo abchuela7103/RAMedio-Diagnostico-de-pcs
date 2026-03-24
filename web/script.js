@@ -108,10 +108,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                             diagnosisText.style.color = "var(--text-primary)";
                             const treeContainer = document.getElementById('index-tree-chart');
                             treeContainer.style.display = 'block';
-                            
+
                             const idxChart = echarts.init(treeContainer, 'dark');
-                            
-                            if(globalTreeDataIndex && mlData.decision_path) {
+
+                            if (globalTreeDataIndex && mlData.decision_path) {
                                 idxChart.setOption({
                                     backgroundColor: 'transparent',
                                     series: [{
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                         data: [globalTreeDataIndex],
                                         top: '2%', left: '8%', bottom: '2%', right: '20%',
                                         symbolSize: 8, roam: true, initialTreeDepth: 3,
-                                        label: { color: '#fff', fontSize: 13, backgroundColor: 'rgba(0,0,0,0.6)', padding: [3,6], borderRadius: 4 },
+                                        label: { color: '#fff', fontSize: 13, backgroundColor: 'rgba(0,0,0,0.6)', padding: [3, 6], borderRadius: 4 },
                                         itemStyle: { color: '#1e90ff', borderColor: '#00f2fe' },
                                         lineStyle: { color: '#555', width: 2, curveness: 0.5 },
                                         animationDuration: 300,
@@ -130,9 +130,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 const pathArray = mlData.decision_path;
                                 let step = 0;
                                 let clonedTree = JSON.parse(JSON.stringify(globalTreeDataIndex));
-                                
+
                                 const animationInterval = setInterval(() => {
-                                    if(step >= pathArray.length) {
+                                    if (step >= pathArray.length) {
                                         clearInterval(animationInterval);
                                         // Finalizar la animación: presentar veredicto de forma prominente
                                         diagnosisText.innerHTML = `<strong>Veredicto:</strong> ${mlData.diagnostico_ml}<br><span style="font-size: 0.95em; color: #acc; font-weight: normal; margin-top: 5px; display: inline-block;">💡 ${mlData.solucion}</span>`;
@@ -141,24 +141,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                                         } else {
                                             diagnosisText.style.color = "#fbbf24";
                                         }
-                                        
+
                                         goDashboardBtn.onclick = () => { window.location.href = `dashboard.html?device_id=${encodeURIComponent(payload.device_id)}`; };
                                         goDashboardBtn.classList.remove('hidden');
                                         return;
                                     }
-                                    
+
                                     const activeNodes = pathArray.slice(0, step + 1);
                                     const currentNodeId = pathArray[step];
-                                    
+
                                     function styleNode(node) {
                                         if (activeNodes.includes(node.node_id)) {
                                             node.itemStyle = Object.assign({}, node.itemStyle || {}, { color: '#ff4757', borderColor: '#ff4757', shadowBlur: 20, shadowColor: '#ff4757' });
-                                            node.collapsed = false; 
+                                            node.collapsed = false;
                                         }
                                         if (node.node_id === currentNodeId) {
                                             node.symbolSize = 20;
                                             node.label = Object.assign({}, node.label || {}, { color: '#ff4757', fontWeight: 'bold', fontSize: 15 });
-                                            if (step === pathArray.length - 1) { 
+                                            if (step === pathArray.length - 1) {
                                                 node.label = Object.assign(node.label, { fontSize: 18, backgroundColor: '#ff4757', color: '#fff' });
                                                 node.symbolSize = 30;
                                             }
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                             });
                                         }
                                     }
-                                    
+
                                     const frameTree = JSON.parse(JSON.stringify(clonedTree));
                                     styleNode(frameTree);
                                     idxChart.setOption({ series: [{ type: 'tree', data: [frameTree] }] });
