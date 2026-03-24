@@ -1,6 +1,6 @@
 import requests
 
-SERVER_URL = "http://40.233.30.180/metrics"
+SERVER_URL = "http://127.0.0.1:8000/metrics"
 
 def send_metrics(payload):
     try:
