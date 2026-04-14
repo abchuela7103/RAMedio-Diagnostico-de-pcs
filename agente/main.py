@@ -107,6 +107,70 @@ def recolectar_metricas(app):
 class AgenteApp:
     def __init__(self, root):
         self.root = root
+        self.root.withdraw() # Ocultar ventana principal momentáneamente
+        
+        # --- VENTANA DE DIÁLOGO PREVIA ---
+        self.acepto_terminos = False
+        
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Autorización RAMedio")
+        dialog.geometry("450x250")
+        dialog.resizable(False, False)
+        # Centrar la ventana en la pantalla (aproximado)
+        dialog.update_idletasks()
+        x = (dialog.winfo_screenwidth() // 2) - (450 // 2)
+        y = (dialog.winfo_screenheight() // 2) - (250 // 2)
+        dialog.geometry(f"+{x}+{y}")
+        
+        # Si el usuario cierra el popup en la 'X', destruimos toda la aplicación
+        dialog.protocol("WM_DELETE_WINDOW", lambda: self.root.destroy())
+        
+        tk.Label(
+            dialog, 
+            text="Para ejecutar el agente RAMedio necesitamos de tu autorización para la recolección de métricas.", 
+            font=("Helvetica", 11), wraplength=400, justify="center"
+        ).pack(pady=20)
+        
+        var_terminos = tk.BooleanVar(value=False)
+        chk = tk.Checkbutton(dialog, text="Acepto los términos y condiciones de privacidad", variable=var_terminos, font=("Helvetica", 10))
+        chk.pack(pady=5)
+        
+        def mostrar_detalles():
+            aviso_privacidad = (
+                "AVISO DE PRIVACIDAD Y TÉRMINOS DE USO\n\n"
+                "Para funcionar correctamente, el Agente RAMedio necesita recolectar métricas de rendimiento "
+                "de hardware de tu computadora (porcentajes de uso de CPU, RAM, Disco Activo, GPU y estado de batería).\n\n"
+                "Estos datos serán enviados de forma temporal a nuestros algoritmos en la nube para generar un diagnóstico "
+                "inteligente automatizado.\n\n"
+                "Tu privacidad es prioridad: NO recolectamos archivos personales, documentos, contraseñas, "
+                "registros de teclado ni historial de navegación web; la extracción de datos es estrictamente instrumental."
+            )
+            messagebox.showinfo("Aviso de Privacidad - Detalles", aviso_privacidad, parent=dialog)
+            
+        btn_detalles = tk.Button(dialog, text="Ver más detalles", command=mostrar_detalles, fg="#2563eb", cursor="hand2", relief=tk.FLAT, font=("Helvetica", 9, "underline"))
+        btn_detalles.pack(pady=5)
+        
+        def continuar():
+            if not var_terminos.get():
+                messagebox.showwarning("Atención", "Por favor, seleccione la casilla de aceptación para poder usar el agente.", parent=dialog)
+            else:
+                self.acepto_terminos = True
+                dialog.destroy()
+                
+        btn_continuar = tk.Button(dialog, text="Continuar", command=continuar, bg="#3b82f6", fg="white", font=("Helvetica", 10, "bold"), padx=20, pady=5)
+        btn_continuar.pack(pady=15)
+        
+        # Pausar la ejecución aquí hasta que la ventana secundaria 'dialog' se destruya
+        self.root.wait_window(dialog)
+        
+        # Si la ventana se destruyó y no aceptó (ej. clickeó la X de cerrar), abortamos
+        if not self.acepto_terminos:
+            self.root.destroy()
+            return
+            
+        self.root.deiconify() # Mostrar la ventana principal de nuevo
+        # ---------------------------------
+        
         self.root.title("RAMedio - Agente de Diagnóstico")
         
         # Tamaño de ventana (no fullscreen pero grande)
@@ -175,7 +239,7 @@ class AgenteApp:
         # Custom Hover effects
         self.bind_hovers(self.btn_iniciar, BTN_PRIMARY, BTN_PRIMARY_HOVER)
         self.bind_hovers(self.btn_formulario, BTN_ACCENT, BTN_ACCENT_HOVER)
-
+        
         # Iniciar animación
         self.animar_fondo()
 
