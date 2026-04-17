@@ -108,41 +108,38 @@
     </style>
 </head>
 
-<body>
-    <div class="background-animation"></div>
+<body style="background-color: #222;">
+    <!-- Eliminada la animación de fondo para emparejar la rigidez plana del Agente Escitorio -->
 
     <div class="container-fluid py-4" style="max-width: 1500px;">
         <div class="row g-4">
             <!-- Sidebar para Equipos del Usuario -->
             <aside class="col-lg-3 col-md-4">
-                <div class="sidebar glass-panel p-4 h-100 position-sticky" style="top: 20px;">
-                    <h3 class="text-white text-center mb-4" style="font-size: 1.2rem;">Mis Equipos</h3>
+                <div class="card p-4 h-100 position-sticky rounded-0 border-0" style="top: 20px; background-color: #303030;">
+                    <h3 class="text-light text-center mb-4" style="font-size: 1.2rem;">Mis Equipos</h3>
                     <div id="device-list" class="d-flex flex-column gap-2 mb-4">
                         <p class="text-center" style="color: #acc; font-size: 0.9rem;">Cargando dispositivos...</p>
                     </div>
 
-                    <a href="index.html" class="btn btn-primary w-100 mb-3">Ir al Formulario web</a>
-                    <a href="history.html" class="btn btn-primary w-100 mb-3">Ver Historial</a>
+                    <a href="index.html" class="btn btn-primary rounded-0 w-100 mb-3">Ir al Formulario web</a>
+                    <a href="history.html" class="btn btn-primary rounded-0 w-100 mb-3">Ver Historial</a>
 
-                    <button id="logout-btn" class="btn btn-outline-danger w-100 mb-3"
-                        style="background: rgba(220,53,69,0.15);">Cerrar Sesión</button>
+                    <button id="logout-btn" class="btn btn-outline-danger rounded-0 w-100 mb-3 text-light border-secondary hover-danger"
+                        style="background-color: transparent;">Cerrar Sesión</button>
                 </div>
             </aside>
 
             <!-- Contenido Principal -->
             <main class="col-lg-9 col-md-8">
-                <div class="glass-panel p-4 h-100">
-                    <header>
-                        <div class="logo-container">
-                            <div class="pulse-ring"></div>
-                            <h1>Panel de Control TI</h1>
-                        </div>
-                        <p class="subtitle">Monitoreo y Auditoría de Algoritmos Inteligentes</p>
+                <div class="card p-4 h-100 rounded-0 border-0" style="background-color: #303030;">
+                    <header class="text-center">
+                        <h2 class="text-light fw-bold" style="letter-spacing: 1px;">RAMedio Dashboard</h2>
+                        <p class="text-muted">Monitoreo y Auditoría de Dispositivos Remotos</p>
                     </header>
 
-                    <div class="input-group">
+                    <div class="input-group text-center mx-auto" style="max-width: 400px; padding-bottom: 20px;">
                         <input type="text" id="dashboard_device_id" placeholder="Ingresa ID de Computadora..." readonly
-                            style="background: rgba(0,0,0,0.2); opacity: 0.8; user-select: none;">
+                            class="form-control rounded-0 bg-dark text-light border-secondary text-center">
                         <button id="load_metrics_btn" style="display: none;">Cargar Telemetría</button>
                     </div>
 

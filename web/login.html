@@ -57,37 +57,32 @@
         }
     </style>
 </head>
-<body class="d-flex align-items-center justify-content-center vh-100">
-    <div class="background-animation"></div>
-
-    <main class="container glass-panel login-container p-4 p-md-5">
-        <header>
-            <div class="logo-container" style="justify-content: center;">
-                <div class="pulse-ring"></div>
-                <h1>RAMedio</h1>
-            </div>
-            <p class="subtitle" id="form-subtitle">Inicia sesión en tu cuenta</p>
+<body class="d-flex align-items-center justify-content-center vh-100" style="background-color: #222;">
+    <main class="card p-4 p-md-5 rounded-0 border-0" style="width: 100%; max-width: 500px; background-color: #303030;">
+        <header class="text-center mb-4">
+            <h2 class="text-light fw-bold" style="letter-spacing: 1px;">RAMedio Login</h2>
         </header>
 
         <form id="auth-form">
-            <div class="form-group-login">
-                <label for="username">Usuario</label>
-                <input type="text" id="username" name="username" placeholder="Tu nombre de usuario" required>
+            <div class="mb-4 text-center">
+                <label for="username" class="form-label text-light fs-5">Usuario:</label>
+                <input type="text" id="username" name="username" class="form-control rounded-0 bg-dark text-light border-secondary" required>
             </div>
             
-            <div class="form-group-login">
-                <label for="password">Contraseña</label>
-                <input type="password" id="password" name="password" placeholder="Tu contraseña" required>
+            <div class="mb-4 text-center">
+                <label for="password" class="form-label text-light fs-5">Contraseña:</label>
+                <input type="password" id="password" name="password" class="form-control rounded-0 bg-dark text-light border-secondary" required>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100 mb-3" id="submit-btn" style="padding: 12px; font-size: 1.1rem; border-radius: 8px;">
+            <div class="text-center mt-5">
+                <button type="submit" class="btn btn-primary rounded-0 mb-3" id="submit-btn" style="width: 200px; font-weight: 500;">
                 <span id="btn-text">Iniciar Sesión</span>
                 <div class="loader hidden" id="loader" style="display: inline-block; width: 1.5rem; height: 1.5rem;"></div>
             </button>
+            <br>
+            <button type="button" class="btn btn-link text-light text-decoration-none" id="toggle-mode-btn">Registrarse</button>
+            </div>
         </form>
-
-        <button type="button" class="btn btn-outline-primary w-100" id="toggle-mode-btn" style="border: none; padding: 12px; font-size: 1rem; border-radius: 8px;">¿No tienes cuenta? Regístrate aquí</button>
-
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
