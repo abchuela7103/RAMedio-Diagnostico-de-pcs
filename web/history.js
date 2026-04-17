@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 // Redirigir al dashboard con la MAC o UUID del equipo
                 col.innerHTML = `
-                    <div class="glass-panel p-4 text-center cursor-pointer history-card h-100" style="cursor: pointer; transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.05);" onclick="window.location.href='dashboard.html?device_id=${encodeURIComponent(device)}'">
+                    <div class="card rounded-0 border-secondary p-4 text-center cursor-pointer history-card h-100" style="background-color: #2a2a2a; cursor: pointer; transition: all 0.3s ease;" onclick="window.location.href='dashboard.html?device_id=${encodeURIComponent(device)}'">
                         <div style="font-size: 2.8rem; margin-bottom: 15px;">🖥️</div>
                         <h5 class="text-white mb-2" style="word-break: break-all; font-weight: 600;">${device}</h5>
                         <div class="mt-3">

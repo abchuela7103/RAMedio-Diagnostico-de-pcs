@@ -152,36 +152,37 @@
 
                         <!-- Model Accuracy (Gauge) -->
                         <div class="col-lg-6 col-12">
-                            <div class="chart-card">
+                            <div class="card rounded-0 border-secondary h-100 p-3" style="background-color: #2a2a2a;">
                                 <h3>Precisión General del Algoritmo</h3>
                                 <div id="accuracy-gauge" style="width: 100%; height: 350px;"></div>
                             </div>
+                        </div>
 
-                            <!-- Model Probabilities (Bar Chart) -->
-                            <div class="col-lg-6 col-12">
-                                <div class="chart-card h-100">
-                                    <h3>Análisis Predictivo Detallado</h3>
-                                    <h2 id="current-diagnosis-text"
-                                        style="text-align:center; color:#00f2fe; margin-top: -10px; margin-bottom: 5px;">
-                                        Calculando...</h2>
-                                    <p id="current-solution-text"
-                                        style="text-align:center; color:#acc; margin-bottom: 20px; font-size: 1.05rem; display: none; margin-top: 5px;">
-                                    </p>
-                                    <div id="proba-chart" style="width: 100%; height: 350px;"></div>
-                                </div>
+                        <!-- Model Probabilities (Bar Chart) -->
+                        <div class="col-lg-6 col-12">
+                            <div class="card rounded-0 border-secondary h-100 p-3" style="background-color: #2a2a2a;">
+                                <h3>Análisis Predictivo Detallado</h3>
+                                <h2 id="current-diagnosis-text"
+                                    style="text-align:center; color:#00f2fe; margin-top: -10px; margin-bottom: 5px;">
+                                    Calculando...</h2>
+                                <p id="current-solution-text"
+                                    style="text-align:center; color:#acc; margin-bottom: 20px; font-size: 1.05rem; display: none; margin-top: 5px;">
+                                </p>
+                                <div id="proba-chart" style="width: 100%; height: 350px;"></div>
+                            </div>
+                        </div>
 
-                                <!-- Decision Tree (Tree) -->
-                                <div class="col-12">
-                                    <div class="chart-card">
-                                        <h3>Estructura Lógica del Árbol de Decisión (Caja Blanca)</h3>
-                                        <p
-                                            style="text-align: center; color: #acc; font-size: 0.9rem; margin-top: -10px; margin-bottom: 10px;">
-                                            Puedes hacer clic en los nodos circulares para expandir o colapsar las
-                                            sub-reglas, y usar el ratón para hacer zoom/paneo.
-                                        </p>
-                                        <div id="tree-chart" style="width: 100%; height: 600px;"></div>
-                                    </div>
-                                </div>
+                        <!-- Decision Tree (Tree) -->
+                        <div class="col-12 mt-4">
+                            <div class="card rounded-0 border-secondary p-3" style="background-color: #2a2a2a;">
+                                <h3>Estructura Lógica del Árbol de Decisión (Caja Blanca)</h3>
+                                <p style="text-align: center; color: #acc; font-size: 0.9rem; margin-top: -10px; margin-bottom: 10px;">
+                                    Puedes hacer clic en los nodos circulares para expandir o colapsar las
+                                    sub-reglas, y usar el ratón para hacer zoom/paneo.
+                                </p>
+                                <div id="tree-chart" style="width: 100%; height: 600px;"></div>
+                            </div>
+                        </div>
                             </div>
             </main>
         </div>
