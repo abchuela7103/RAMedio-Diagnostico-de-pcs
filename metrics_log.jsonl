@@ -18,3 +18,4 @@
 {"device_id": "DESKTOP-0TH83K2", "timestamp": "2026-04-17T07:19:12.216453+00:00", "metrics": {"cpu": 16.7, "ram": 48.38, "disk": 91.5, "disk_active": 0.0, "gpu": 7.0, "battery": null}}
 {"device_id": "DESKTOP-0TH83K2", "timestamp": "2026-04-17T07:22:43.199782+00:00", "metrics": {"cpu": 11.52, "ram": 48.18, "disk": 91.5, "disk_active": 0.0, "gpu": 4.6, "battery": null}}
 {"device_id": "DESKTOP-0TH83K2", "timestamp": "2026-04-17T07:26:58.941755+00:00", "metrics": {"cpu": 18.6, "ram": 48.4, "disk": 91.5, "disk_active": 0.0, "gpu": 6.4, "battery": null}}
+{"device_id": "DESKTOP-0TH83K2", "timestamp": "2026-04-17T07:39:36.216455+00:00", "metrics": {"cpu": 6.3, "ram": 48.34, "disk": 91.5, "disk_active": 0.0, "gpu": 2.4, "battery": null}}
