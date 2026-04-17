@@ -1,13 +1,15 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import socket
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
+import hashlib
+import os
 
 from database import engine, get_db, Base
-from models import MetricRecord, SymptomRecord
+from models import MetricRecord, SymptomRecord, User, UserSession, UserDevice
 
 # Inicializar Base de datos y crear tablas si no existen
 Base.metadata.create_all(bind=engine)
@@ -53,9 +55,85 @@ class SymptomPayload(BaseModel):
     timestamp: str
     symptoms: SymptomsData
 
+class AuthPayload(BaseModel):
+    username: str
+    password: str
+
+class LinkPayload(BaseModel):
+    device_id: str
+
+# -----------------
+# AUTH & DEPENDENCIES
+# -----------------
+
+def hash_password(password: str) -> str:
+    # Simple hashing (in production use bcrypt or passlib)
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def get_current_user(authorization: str = Header(None), db: Session = Depends(get_db)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Token no proporcionado")
+    
+    token = authorization.replace("Bearer ", "")
+    session = db.query(UserSession).filter(UserSession.token == token).first()
+    
+    if not session or session.expires_at < datetime.utcnow():
+        raise HTTPException(status_code=401, detail="Sesión expirada o inválida")
+        
+    user = db.query(User).filter(User.id == session.user_id).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="Usuario no encontrado")
+        
+    return user
+
 # -----------------
 # ENDPOINTS 
 # -----------------
+
+@app.post("/api/register")
+def register(data: AuthPayload, db: Session = Depends(get_db)):
+    existing_user = db.query(User).filter(User.username == data.username).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="El usuario ya existe")
+        
+    new_user = User(
+        username=data.username,
+        password_hash=hash_password(data.password)
+    )
+    db.add(new_user)
+    db.commit()
+    return {"status": "ok", "message": "Usuario registrado exitosamente"}
+
+@app.post("/api/login")
+def login(data: AuthPayload, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.username == data.username).first()
+    if not user or user.password_hash != hash_password(data.password):
+        raise HTTPException(status_code=401, detail="Credenciales inválidas")
+        
+    # Crear token
+    token = os.urandom(32).hex()
+    session = UserSession(
+        token=token,
+        user_id=user.id,
+        expires_at=datetime.utcnow() + timedelta(days=30)
+    )
+    db.add(session)
+    db.commit()
+    return {"status": "ok", "token": token, "username": user.username}
+
+@app.post("/api/devices/link")
+def link_device(data: LinkPayload, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    existing_link = db.query(UserDevice).filter(UserDevice.device_id == data.device_id, UserDevice.user_id == current_user.id).first()
+    if not existing_link:
+        new_link = UserDevice(user_id=current_user.id, device_id=data.device_id)
+        db.add(new_link)
+        db.commit()
+    return {"status": "ok", "message": "Dispositivo vinculado al usuario"}
+
+@app.get("/api/user/devices")
+def get_user_devices(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    devices = db.query(UserDevice).filter(UserDevice.user_id == current_user.id).all()
+    return {"devices": [d.device_id for d in devices]}
 
 @app.post("/metrics")
 def receive_metrics(data: Metrics, db: Session = Depends(get_db)):

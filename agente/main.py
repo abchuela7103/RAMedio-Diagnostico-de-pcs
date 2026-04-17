@@ -8,6 +8,7 @@ import json
 from datetime import datetime, UTC 
 import socket
 import webbrowser
+import requests
 
 # Identificador del equipo
 device_id = socket.gethostname()
@@ -104,14 +105,110 @@ def recolectar_metricas(app):
     threading.Thread(target=tarea, daemon=True).start()
 
 
+class LoginDialog:
+    def __init__(self, parent, on_success):
+        self.top = tk.Toplevel(parent)
+        self.top.title("Iniciar Sesión - RAMedio")
+        self.top.geometry("400x500")
+        self.top.resizable(False, False)
+        self.top.configure(bg=BG_COLOR)
+        
+        # Center the window
+        self.top.update_idletasks()
+        x = (self.top.winfo_screenwidth() // 2) - (400 // 2)
+        y = (self.top.winfo_screenheight() // 2) - (500 // 2)
+        self.top.geometry(f"+{x}+{y}")
+        
+        self.on_success = on_success
+        self.token = None
+        self.username = None
+        
+        self.top.protocol("WM_DELETE_WINDOW", self.on_close)
+        
+        # UI Elements
+        tk.Label(self.top, text="RAMedio Login", font=("Helvetica", 18, "bold"), bg=BG_COLOR, fg=TEXT_MAIN).pack(pady=(40, 30))
+        
+        tk.Label(self.top, text="Usuario:", bg=BG_COLOR, fg=TEXT_MAIN, font=("Helvetica", 11)).pack()
+        self.ent_user = tk.Entry(self.top, font=("Helvetica", 12), justify="center")
+        self.ent_user.pack(pady=5)
+        
+        tk.Label(self.top, text="Contraseña:", bg=BG_COLOR, fg=TEXT_MAIN, font=("Helvetica", 11)).pack(pady=(10,0))
+        self.ent_pass = tk.Entry(self.top, font=("Helvetica", 12), show="*", justify="center")
+        self.ent_pass.pack(pady=5)
+        
+        self.btn_login = tk.Button(self.top, text="Iniciar Sesión", bg=BTN_PRIMARY, fg="white", font=("Helvetica", 12, "bold"), command=self.login, padx=30, pady=8, bd=0, cursor="hand2")
+        self.btn_login.pack(pady=(30, 10))
+        
+        self.btn_register = tk.Button(self.top, text="Registrarse", bg=PANEL_COLOR, fg=TEXT_MAIN, font=("Helvetica", 10), command=self.register, padx=20, pady=5, bd=0, cursor="hand2")
+        self.btn_register.pack()
+
+    def on_close(self):
+        self.top.destroy()
+        
+    def login(self):
+        user = self.ent_user.get()
+        pwd = self.ent_pass.get()
+        if not user or not pwd:
+            messagebox.showwarning("Error", "Llenar todos los campos", parent=self.top)
+            return
+        try:
+            r = requests.post("http://40.233.30.180/api/login", json={"username": user, "password": pwd})
+            if r.status_code == 200:
+                data = r.json()
+                self.token = data.get("token")
+                self.username = data.get("username")
+                self.top.destroy()
+                self.on_success(self.token, self.username)
+            else:
+                messagebox.showerror("Error", r.json().get("detail", "Error de login"), parent=self.top)
+        except Exception as e:
+            messagebox.showerror("Error", f"Fallo al conectar: {e}", parent=self.top)
+
+    def register(self):
+        user = self.ent_user.get()
+        pwd = self.ent_pass.get()
+        if not user or not pwd:
+            messagebox.showwarning("Error", "Llenar todos los campos", parent=self.top)
+            return
+        try:
+            r = requests.post("http://40.233.30.180/api/register", json={"username": user, "password": pwd})
+            if r.status_code == 200:
+                messagebox.showinfo("Éxito", "Registrado exitosamente. Ahora puedes iniciar sesión.", parent=self.top)
+            else:
+                messagebox.showerror("Error", r.json().get("detail", "Error de registro"), parent=self.top)
+        except Exception as e:
+            messagebox.showerror("Error", f"Fallo al conectar: {e}", parent=self.top)
+
 class AgenteApp:
     def __init__(self, root):
         self.root = root
         self.root.withdraw() # Ocultar ventana principal momentáneamente
         
-        # --- VENTANA DE DIÁLOGO PREVIA ---
+        self.auth_token = None
+        self.username = None
         self.acepto_terminos = False
-        
+
+        # Primero mostramos el Login
+        self.mostrar_login()
+
+    def mostrar_login(self):
+        def on_login_success(token, username):
+            self.auth_token = token
+            self.username = username
+            
+            # Intentar vincular este device_id al usuario (silenciosamente)
+            try:
+                headers = {"Authorization": f"Bearer {self.auth_token}"}
+                requests.post("http://40.233.30.180/api/devices/link", json={"device_id": device_id}, headers=headers)
+            except Exception:
+                pass # Continue even if link fails
+
+            self.pedir_autorizacion()
+
+        LoginDialog(self.root, on_login_success)
+
+    def pedir_autorizacion(self):
+        # --- VENTANA DE DIÁLOGO PREVIA ---
         dialog = tk.Toplevel(self.root)
         dialog.title("Autorización RAMedio")
         dialog.geometry("450x250")
@@ -191,9 +288,30 @@ class AgenteApp:
         # Main Panel
         self.panel = tk.Frame(self.bg_canvas, bg=PANEL_COLOR, bd=0, highlightthickness=2, highlightbackground=BTN_PRIMARY)
         self.panel.place(relx=0.5, rely=0.5, anchor=tk.CENTER, width=700, height=450)
+        
+        self.root.title("RAMedio - Agente de Diagnóstico")
+        
+        # Tamaño de ventana (no fullscreen pero grande)
+        self.root.geometry("1100x750")
+        self.root.configure(bg=BG_COLOR)
+
+        # Por seguridad y UX, permitir salir con Escape
+        self.root.bind("<Escape>", lambda e: self.root.destroy())
+
+        # Fondo animado
+        self.bg_canvas = tk.Canvas(self.root, bg=BG_COLOR, highlightthickness=0)
+        self.bg_canvas.pack(fill=tk.BOTH, expand=True)
+
+        # Crear orbes animados en el fondo
+        self.orbs = []
+        self.crear_orbes()
+
+        # Main Panel
+        self.panel = tk.Frame(self.bg_canvas, bg=PANEL_COLOR, bd=0, highlightthickness=2, highlightbackground=BTN_PRIMARY)
+        self.panel.place(relx=0.5, rely=0.5, anchor=tk.CENTER, width=700, height=450)
 
         # Título formales como en main
-        lbl_titulo = tk.Label(self.panel, text="RAMedio Agente", font=("Helvetica", 20, "bold"), bg=PANEL_COLOR, fg=TEXT_MAIN)
+        lbl_titulo = tk.Label(self.panel, text=f"RAMedio - Bienvenido, {self.username}", font=("Helvetica", 20, "bold"), bg=PANEL_COLOR, fg=TEXT_MAIN)
         lbl_titulo.pack(pady=(40, 10))
 
         # ID de equipo formal
@@ -201,7 +319,7 @@ class AgenteApp:
         lbl_device.pack(pady=(0, 25))
 
         # Estado formal
-        self.lbl_estado = tk.Label(self.panel, text="Presiona el botón para iniciar la medición.", font=("Helvetica", 13), bg=PANEL_COLOR, fg=TEXT_MAIN)
+        self.lbl_estado = tk.Label(self.panel, text="¿Qué deseas hacer a continuación?", font=("Helvetica", 13), bg=PANEL_COLOR, fg=TEXT_MAIN)
         self.lbl_estado.pack(pady=(0, 25))
 
         # Progress bar configuration
@@ -219,22 +337,23 @@ class AgenteApp:
 
         # Botón Iniciar formal
         self.btn_iniciar = tk.Button(
-            self.btn_frame, text="Iniciar Recolección", 
+            self.btn_frame, text="Ejecutar Agente", 
             font=("Helvetica", 12, "bold"), bg=BTN_PRIMARY, fg="white", 
             activebackground=BTN_PRIMARY_HOVER, activeforeground="white",
             relief=tk.FLAT, cursor="hand2", padx=30, pady=15, bd=0,
             command=lambda: recolectar_metricas(self)
         )
-        self.btn_iniciar.pack()
+        self.btn_iniciar.pack(side=tk.LEFT, padx=10)
 
-        # Botón Ir al formulario formal
+        # Botón Ir al formulario formal (renombrado a Ver Historial)
         self.btn_formulario = tk.Button(
-            self.btn_frame, text="Ir al Formulario Web", 
+            self.btn_frame, text="Ver Historial", 
             font=("Helvetica", 12, "bold"), bg=BTN_ACCENT, fg="white", 
             activebackground=BTN_ACCENT_HOVER, activeforeground="white",
             relief=tk.FLAT, cursor="hand2", padx=30, pady=15, bd=0,
             command=self.abrir_formulario
         )
+        self.btn_formulario.pack(side=tk.LEFT, padx=10)
 
         # Custom Hover effects
         self.bind_hovers(self.btn_iniciar, BTN_PRIMARY, BTN_PRIMARY_HOVER)
@@ -312,7 +431,9 @@ class AgenteApp:
         messagebox.showerror("Error", f"Ocurrió un error:\n{str(e)}")
 
     def abrir_formulario(self):
-        url_formulario = f"http://40.233.30.180/?device_id={device_id}"
+        # Envía el token al navegador para que éste auto inicie sesión si lo soporta.
+        # En caso de que no tenga sesión web, lo iniciará con el token.
+        url_formulario = f"http://40.233.30.180/?device_id={device_id}&token={self.auth_token}"
         webbrowser.open(url_formulario)
 
 if __name__ == "__main__":

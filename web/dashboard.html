@@ -97,22 +97,37 @@
 <body>
     <div class="background-animation"></div>
     
-    <main class="container glass-panel" style="max-width: 1200px; padding: 30px;">
-        <a href="index.html" class="nav-link" id="return-link">← Regresar al Formulario</a>
-        <header>
-            <div class="logo-container">
-                <div class="pulse-ring"></div>
-                <h1>Panel de Control TI</h1>
+    <div class="dashboard-wrapper" style="display: flex; gap: 20px; max-width: 1400px; margin: 0 auto; padding: 20px;">
+        
+        <!-- Sidebar para Equipos del Usuario -->
+        <aside class="sidebar glass-panel" style="width: 280px; padding: 20px; height: fit-content; position: sticky; top: 20px;">
+            <h3 style="color: white; margin-top: 0; margin-bottom: 20px; font-size: 1.2rem; text-align: center;">Mis Equipos</h3>
+            <div id="device-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px;">
+                <p style="color: #acc; text-align: center; font-size: 0.9rem;">Cargando dispositivos...</p>
             </div>
-            <p class="subtitle">Monitoreo y Auditoría de Algoritmos Inteligentes</p>
-        </header>
+            
+            <a href="index.html" class="nav-link" id="return-link" style="display: block; text-align: center; margin-bottom: 15px;">Ir al Formulario web</a>
+            
+            <button id="logout-btn" class="secondary-btn" style="width: 100%; margin-top: 10px; padding: 10px; background: rgba(255,50,50,0.2); border: 1px solid rgba(255,50,50,0.3); color: white; border-radius: 8px; cursor: pointer;">Cerrar Sesión</button>
+            <a href="#" onclick="alert('Funcionalidad de descarga se habilitará pronto.')" class="nav-link" style="display: block; margin-top: 15px; text-align: center; color: #2ed573;">⬇ Descargar Agente RAMedio</a>
+        </aside>
 
-        <div class="input-group">
-            <input type="text" id="dashboard_device_id" placeholder="Ingresa ID de Computadora...">
-            <button id="load_metrics_btn">Cargar Telemetría</button>
-        </div>
+        <!-- Contenido Principal -->
+        <main class="container glass-panel" style="flex: 1; max-width: none; padding: 30px; margin: 0;">
+            <header>
+                <div class="logo-container">
+                    <div class="pulse-ring"></div>
+                    <h1>Panel de Control TI</h1>
+                </div>
+                <p class="subtitle">Monitoreo y Auditoría de Algoritmos Inteligentes</p>
+            </header>
 
-        <div class="dashboard-grid">
+            <div class="input-group">
+                <input type="text" id="dashboard_device_id" placeholder="Ingresa ID de Computadora..." readonly style="background: rgba(0,0,0,0.2); opacity: 0.8; user-select: none;">
+                <button id="load_metrics_btn" style="display: none;">Cargar Telemetría</button>
+            </div>
+
+            <div class="dashboard-grid">
             <!-- Hardware History (Line) -->
             <div class="chart-card full-width">
                 <h3>Historial de Rendimiento en Tiempo Real</h3>

@@ -1,4 +1,26 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // --- AUTH LOGIC ---
+    const urlParamsAuth = new URLSearchParams(window.location.search);
+    const urlToken = urlParamsAuth.get('token');
+    if (urlToken) {
+        localStorage.setItem('token', urlToken);
+        urlParamsAuth.delete('token');
+        const newUrl = window.location.pathname + (urlParamsAuth.toString() ? '?' + urlParamsAuth.toString() : '');
+        window.history.replaceState({}, '', newUrl);
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'login.html' + window.location.search;
+        return;
+    }
+
+    document.getElementById('logout-btn').addEventListener('click', () => {
+        localStorage.removeItem('token');
+        window.location.href = 'login.html';
+    });
+    // ------------------
+
     // Inicializar contenedores de Gráficos ECharts usando el tema 'dark' predeterminado de echarts
     const hardwareDom = document.getElementById('hardware-chart');
     const accuracyDom = document.getElementById('accuracy-gauge');
@@ -391,6 +413,49 @@ document.addEventListener('DOMContentLoaded', async () => {
             returnLink.href = `index.html?device_id=${encodeURIComponent(originDeviceId)}`;
         }
     }
+
+    // --- CARGAR EQUIPOS DEL USUARIO ---
+    async function cargarEquipos() {
+         const listContainer = document.getElementById('device-list');
+         try {
+             const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://127.0.0.1:8000' : '';
+             const res = await fetch(`${API_BASE}/api/user/devices`, {
+                 headers: { 'Authorization': `Bearer ${token}` }
+             });
+             
+             if (res.ok) {
+                 const data = await res.json();
+                 listContainer.innerHTML = '';
+                 if (data.devices && data.devices.length > 0) {
+                     data.devices.forEach(dev => {
+                         const btn = document.createElement('button');
+                         btn.textContent = dev;
+                         btn.className = 'secondary-btn';
+                         btn.style.width = '100%';
+                         btn.style.margin = '0';
+                         btn.style.padding = '10px';
+                         if (originDeviceId === dev) {
+                             btn.style.background = 'rgba(79, 172, 254, 0.3)';
+                             btn.style.borderColor = '#00f2fe';
+                         }
+                         btn.onclick = () => {
+                             window.location.href = `dashboard.html?device_id=${encodeURIComponent(dev)}`;
+                         };
+                         listContainer.appendChild(btn);
+                     });
+                 } else {
+                     listContainer.innerHTML = '<p style="color: #acc; text-align: center; font-size: 0.9rem;">No tienes equipos vinculados.</p>';
+                 }
+             } else {
+                 listContainer.innerHTML = '<p style="color: #ff4757; text-align: center; font-size: 0.8rem;">Sesión expirada o inválida</p>';
+             }
+         } catch(e) {
+             console.error("Error obteniendo equipos", e);
+             listContainer.innerHTML = '<p style="color: #ff4757; text-align: center; font-size: 0.9rem;">Error de red</p>';
+         }
+    }
+    cargarEquipos();
+    // ----------------------------------
 
     // Hacer todos los gráficos responsivos comunes
     window.addEventListener('resize', () => {

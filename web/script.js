@@ -18,6 +18,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Función para auto-detectar Device ID desde URL o caché local
     function fetchDeviceId() {
         const urlParams = new URLSearchParams(window.location.search);
+        
+        // --- AUTH LOGIC ---
+        const urlToken = urlParams.get('token');
+        if (urlToken) {
+            localStorage.setItem('token', urlToken);
+            urlParams.delete('token');
+            const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+            window.history.replaceState({}, '', newUrl);
+        }
+
+        if (!localStorage.getItem('token')) {
+            window.location.href = 'login.html' + window.location.search;
+            return;
+        }
+        // ------------------
+
         const urlId = urlParams.get('device_id');
         let realId = localStorage.getItem('ramedio_real_device_id');
 
