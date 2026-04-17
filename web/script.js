@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Novedad: Pre-cargar el árbol para que la animación sea instantánea tras enviar el form
     let globalTreeDataIndex = null;
-    fetch('http://40.233.30.180/api/ml/tree')
+    fetch('/api/ml/tree')
         .then(res => res.json())
         .then(data => { globalTreeDataIndex = data.tree; })
         .catch(err => console.log("Tree no precargado", err));
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log("Enviando datos al servidor...");
             console.log(JSON.stringify(payload, null, 2));
 
-            const response = await fetch('http://40.233.30.180/api/symptoms', {
+            const response = await fetch('/api/symptoms', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 try {
                     // Segundo Fetch: Pedir el Diagnóstico al modelo predictivo
-                    const mlResponse = await fetch(`http://40.233.30.180/api/diagnostico/${payload.device_id}`);
+                    const mlResponse = await fetch(`/api/diagnostico/${payload.device_id}`);
                     if (mlResponse.ok) {
                         const mlData = await mlResponse.json();
 

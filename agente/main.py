@@ -152,7 +152,7 @@ class LoginDialog:
             messagebox.showwarning("Error", "Llenar todos los campos", parent=self.top)
             return
         try:
-            r = requests.post("http://40.233.30.180/api/login", json={"username": user, "password": pwd})
+            r = requests.post("https://ramedio.duckdns.org/api/login", json={"username": user, "password": pwd})
             if r.status_code == 200:
                 data = r.json()
                 self.token = data.get("token")
@@ -171,7 +171,7 @@ class LoginDialog:
             messagebox.showwarning("Error", "Llenar todos los campos", parent=self.top)
             return
         try:
-            r = requests.post("http://40.233.30.180/api/register", json={"username": user, "password": pwd})
+            r = requests.post("https://ramedio.duckdns.org/api/register", json={"username": user, "password": pwd})
             if r.status_code == 200:
                 messagebox.showinfo("Éxito", "Registrado exitosamente. Ahora puedes iniciar sesión.", parent=self.top)
             else:
@@ -199,7 +199,7 @@ class AgenteApp:
             # Intentar vincular este device_id al usuario (silenciosamente)
             try:
                 headers = {"Authorization": f"Bearer {self.auth_token}"}
-                requests.post("http://40.233.30.180/api/devices/link", json={"device_id": device_id}, headers=headers)
+                requests.post("https://ramedio.duckdns.org/api/devices/link", json={"device_id": device_id}, headers=headers)
             except Exception:
                 pass # Continue even if link fails
 
@@ -433,7 +433,7 @@ class AgenteApp:
     def abrir_formulario(self):
         # Envía el token al navegador para que éste auto inicie sesión si lo soporta.
         # En caso de que no tenga sesión web, lo iniciará con el token.
-        url_formulario = f"http://40.233.30.180/?device_id={device_id}&token={self.auth_token}"
+        url_formulario = f"https://ramedio.duckdns.org/?device_id={device_id}&token={self.auth_token}"
         webbrowser.open(url_formulario)
 
 if __name__ == "__main__":
