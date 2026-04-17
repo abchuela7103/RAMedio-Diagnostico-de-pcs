@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAMedio - Iniciar Sesión</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <style>
         .login-container {
@@ -56,10 +57,10 @@
         }
     </style>
 </head>
-<body>
+<body class="d-flex align-items-center justify-content-center vh-100">
     <div class="background-animation"></div>
 
-    <main class="container glass-panel login-container">
+    <main class="container glass-panel login-container p-4 p-md-5">
         <header>
             <div class="logo-container" style="justify-content: center;">
                 <div class="pulse-ring"></div>
@@ -89,6 +90,7 @@
 
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="login.js"></script>
 </body>
 </html>

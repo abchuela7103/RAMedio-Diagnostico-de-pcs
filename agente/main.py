@@ -1,5 +1,7 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import messagebox
+import ttkbootstrap as ttkb
+from ttkbootstrap.constants import *
 import threading
 from collector import collect_metrics
 from sender import send_metrics
@@ -16,25 +18,10 @@ device_id = socket.gethostname()
 # Archivo donde guardaremos los datos recolectados del agente
 LOG_FILE = "metrics_log.jsonl"
 
-# --- Colores basados en el CSS web ---
-BG_COLOR = "#0f172a"
-PANEL_COLOR = "#1e293b"
-TEXT_MAIN = "#f8fafc"
-TEXT_MUTED = "#94a3b8"
-BTN_PRIMARY = "#3b82f6"
-BTN_PRIMARY_HOVER = "#2563eb"
-BTN_ACCENT = "#8b5cf6"
-BTN_ACCENT_HOVER = "#7c3aed"
-SUCCESS_COLOR = "#10b981"
-ERROR_COLOR = "#ef4444"
-# -------------------------------------
-
 def recolectar_metricas(app):
-    app.btn_iniciar.config(state=tk.DISABLED, bg="#334155", fg=TEXT_MUTED)
-    app.btn_iniciar.unbind("<Enter>")
-    app.btn_iniciar.unbind("<Leave>")
+    app.btn_iniciar.config(state=tk.DISABLED, cursor="")
     
-    app.lbl_estado.config(text="Recolectando métricas... Por favor espera.", fg=TEXT_MAIN)
+    app.lbl_estado.config(text="Recolectando métricas... Por favor espera.")
     app.progress.config(value=0)
     
     # Mostrar el botón Web Inmediatamente - Flujo de Sistemas Distribuidos
@@ -47,7 +34,6 @@ def recolectar_metricas(app):
             
             for i in range(5):
                 app.root.after(0, lambda i=i: app.lbl_estado.config(text=f"Recolectando métricas... Muestra {i+1} de 5"))
-                # Subir progreso justo antes de tomar la muestra, o después de un tramo, en incrementos de 20
                 
                 data = collect_metrics()
                 
@@ -107,17 +93,11 @@ def recolectar_metricas(app):
 
 class LoginDialog:
     def __init__(self, parent, on_success):
-        self.top = tk.Toplevel(parent)
-        self.top.title("Iniciar Sesión - RAMedio")
-        self.top.geometry("400x500")
+        self.top = ttkb.Toplevel(title="Iniciar Sesión - RAMedio", size=(400, 500))
         self.top.resizable(False, False)
-        self.top.configure(bg=BG_COLOR)
         
         # Center the window
-        self.top.update_idletasks()
-        x = (self.top.winfo_screenwidth() // 2) - (400 // 2)
-        y = (self.top.winfo_screenheight() // 2) - (500 // 2)
-        self.top.geometry(f"+{x}+{y}")
+        self.top.place_window_center()
         
         self.on_success = on_success
         self.token = None
@@ -126,20 +106,20 @@ class LoginDialog:
         self.top.protocol("WM_DELETE_WINDOW", self.on_close)
         
         # UI Elements
-        tk.Label(self.top, text="RAMedio Login", font=("Helvetica", 18, "bold"), bg=BG_COLOR, fg=TEXT_MAIN).pack(pady=(40, 30))
+        ttkb.Label(self.top, text="RAMedio Login", font=("Helvetica", 18, "bold"), bootstyle="inverse-dark").pack(pady=(40, 30))
         
-        tk.Label(self.top, text="Usuario:", bg=BG_COLOR, fg=TEXT_MAIN, font=("Helvetica", 11)).pack()
-        self.ent_user = tk.Entry(self.top, font=("Helvetica", 12), justify="center")
+        ttkb.Label(self.top, text="Usuario:", font=("Helvetica", 11)).pack()
+        self.ent_user = ttkb.Entry(self.top, font=("Helvetica", 12), justify="center", width=25)
         self.ent_user.pack(pady=5)
         
-        tk.Label(self.top, text="Contraseña:", bg=BG_COLOR, fg=TEXT_MAIN, font=("Helvetica", 11)).pack(pady=(10,0))
-        self.ent_pass = tk.Entry(self.top, font=("Helvetica", 12), show="*", justify="center")
+        ttkb.Label(self.top, text="Contraseña:", font=("Helvetica", 11)).pack(pady=(10,0))
+        self.ent_pass = ttkb.Entry(self.top, font=("Helvetica", 12), show="*", justify="center", width=25)
         self.ent_pass.pack(pady=5)
         
-        self.btn_login = tk.Button(self.top, text="Iniciar Sesión", bg=BTN_PRIMARY, fg="white", font=("Helvetica", 12, "bold"), command=self.login, padx=30, pady=8, bd=0, cursor="hand2")
+        self.btn_login = ttkb.Button(self.top, text="Iniciar Sesión", bootstyle="primary", command=self.login, width=20)
         self.btn_login.pack(pady=(30, 10))
         
-        self.btn_register = tk.Button(self.top, text="Registrarse", bg=PANEL_COLOR, fg=TEXT_MAIN, font=("Helvetica", 10), command=self.register, padx=20, pady=5, bd=0, cursor="hand2")
+        self.btn_register = ttkb.Button(self.top, text="Registrarse", bootstyle="link", command=self.register)
         self.btn_register.pack()
 
     def on_close(self):
@@ -184,9 +164,18 @@ class AgenteApp:
         self.root = root
         self.root.withdraw() # Ocultar ventana principal momentáneamente
         
+        # Declarar atributos para el Linter Pyre2
         self.auth_token = None
         self.username = None
         self.acepto_terminos = False
+        self.bg_canvas = None
+        self.orbs = []
+        self.panel = None
+        self.lbl_estado = None
+        self.progress = None
+        self.btn_frame = None
+        self.btn_iniciar = None
+        self.btn_formulario = None
 
         # Primero mostramos el Login
         self.mostrar_login()
@@ -209,52 +198,44 @@ class AgenteApp:
 
     def pedir_autorizacion(self):
         # --- VENTANA DE DIÁLOGO PREVIA ---
-        dialog = tk.Toplevel(self.root)
-        dialog.title("Autorización RAMedio")
-        dialog.geometry("450x250")
+        dialog = ttkb.Toplevel(title="Autorización RAMedio", size=(450, 400)) # Increased size to fit everything
         dialog.resizable(False, False)
-        # Centrar la ventana en la pantalla (aproximado)
-        dialog.update_idletasks()
-        x = (dialog.winfo_screenwidth() // 2) - (450 // 2)
-        y = (dialog.winfo_screenheight() // 2) - (250 // 2)
-        dialog.geometry(f"+{x}+{y}")
+        dialog.place_window_center()
         
         # Si el usuario cierra el popup en la 'X', destruimos toda la aplicación
         dialog.protocol("WM_DELETE_WINDOW", lambda: self.root.destroy())
         
-        tk.Label(
+        ttkb.Label(
             dialog, 
             text="Para ejecutar el agente RAMedio necesitamos de tu autorización para la recolección de métricas.", 
             font=("Helvetica", 11), wraplength=400, justify="center"
         ).pack(pady=20)
         
-        var_terminos = tk.BooleanVar(value=False)
-        chk = tk.Checkbutton(dialog, text="Acepto los términos y condiciones de privacidad", variable=var_terminos, font=("Helvetica", 10))
-        chk.pack(pady=5)
+        var_terminos = ttkb.BooleanVar(value=False)
+        chk = ttkb.Checkbutton(dialog, text="Acepto los términos y condiciones", variable=var_terminos, bootstyle="primary-round-toggle")
+        chk.pack(pady=10)
         
         def mostrar_detalles():
             aviso_privacidad = (
                 "AVISO DE PRIVACIDAD Y TÉRMINOS DE USO\n\n"
                 "Para funcionar correctamente, el Agente RAMedio necesita recolectar métricas de rendimiento "
-                "de hardware de tu computadora (porcentajes de uso de CPU, RAM, Disco Activo, GPU y estado de batería).\n\n"
-                "Estos datos serán enviados de forma temporal a nuestros algoritmos en la nube para generar un diagnóstico "
-                "inteligente automatizado.\n\n"
+                "de hardware de tu computadora.\n\n"
                 "Tu privacidad es prioridad: NO recolectamos archivos personales, documentos, contraseñas, "
-                "registros de teclado ni historial de navegación web; la extracción de datos es estrictamente instrumental."
+                "registros de teclado ni historial de navegación web."
             )
-            messagebox.showinfo("Aviso de Privacidad - Detalles", aviso_privacidad, parent=dialog)
+            messagebox.showinfo("Privacidad", aviso_privacidad, parent=dialog)
             
-        btn_detalles = tk.Button(dialog, text="Ver más detalles", command=mostrar_detalles, fg="#2563eb", cursor="hand2", relief=tk.FLAT, font=("Helvetica", 9, "underline"))
+        btn_detalles = ttkb.Button(dialog, text="Ver más detalles", command=mostrar_detalles, bootstyle="link")
         btn_detalles.pack(pady=5)
         
         def continuar():
             if not var_terminos.get():
-                messagebox.showwarning("Atención", "Por favor, seleccione la casilla de aceptación para poder usar el agente.", parent=dialog)
+                messagebox.showwarning("Atención", "Por favor, seleccione la casilla.", parent=dialog)
             else:
                 self.acepto_terminos = True
                 dialog.destroy()
                 
-        btn_continuar = tk.Button(dialog, text="Continuar", command=continuar, bg="#3b82f6", fg="white", font=("Helvetica", 10, "bold"), padx=20, pady=5)
+        btn_continuar = ttkb.Button(dialog, text="Continuar", command=continuar, bootstyle="success", width=20)
         btn_continuar.pack(pady=15)
         
         # Pausar la ejecución aquí hasta que la ventana secundaria 'dialog' se destruya
@@ -268,96 +249,53 @@ class AgenteApp:
         self.root.deiconify() # Mostrar la ventana principal de nuevo
         # ---------------------------------
         
-        self.root.title("RAMedio - Agente de Diagnóstico")
-        
-        # Tamaño de ventana (no fullscreen pero grande)
-        self.root.geometry("1100x750")
-        self.root.configure(bg=BG_COLOR)
-
-        # Por seguridad y UX, permitir salir con Escape
-        self.root.bind("<Escape>", lambda e: self.root.destroy())
-
-        # Fondo animado
-        self.bg_canvas = tk.Canvas(self.root, bg=BG_COLOR, highlightthickness=0)
+        # Fondo animado espacial
+        self.bg_canvas = tk.Canvas(self.root, bg="#0f172a", highlightthickness=0)
         self.bg_canvas.pack(fill=tk.BOTH, expand=True)
 
         # Crear orbes animados en el fondo
-        self.orbs = []
         self.crear_orbes()
 
         # Main Panel
-        self.panel = tk.Frame(self.bg_canvas, bg=PANEL_COLOR, bd=0, highlightthickness=2, highlightbackground=BTN_PRIMARY)
+        self.panel = ttkb.Frame(self.bg_canvas, bootstyle="dark", padding=20)
         self.panel.place(relx=0.5, rely=0.5, anchor=tk.CENTER, width=700, height=450)
         
-        self.root.title("RAMedio - Agente de Diagnóstico")
-        
-        # Tamaño de ventana (no fullscreen pero grande)
-        self.root.geometry("1100x750")
-        self.root.configure(bg=BG_COLOR)
-
-        # Por seguridad y UX, permitir salir con Escape
-        self.root.bind("<Escape>", lambda e: self.root.destroy())
-
-        # Fondo animado
-        self.bg_canvas = tk.Canvas(self.root, bg=BG_COLOR, highlightthickness=0)
-        self.bg_canvas.pack(fill=tk.BOTH, expand=True)
-
-        # Crear orbes animados en el fondo
-        self.orbs = []
-        self.crear_orbes()
-
-        # Main Panel
-        self.panel = tk.Frame(self.bg_canvas, bg=PANEL_COLOR, bd=0, highlightthickness=2, highlightbackground=BTN_PRIMARY)
-        self.panel.place(relx=0.5, rely=0.5, anchor=tk.CENTER, width=700, height=450)
-
         # Título formales como en main
-        lbl_titulo = tk.Label(self.panel, text=f"RAMedio - Bienvenido, {self.username}", font=("Helvetica", 20, "bold"), bg=PANEL_COLOR, fg=TEXT_MAIN)
-        lbl_titulo.pack(pady=(40, 10))
+        lbl_titulo = ttkb.Label(self.panel, text=f"RAMedio - Bienvenido, {self.username}", font=("Helvetica", 20, "bold"), bootstyle="inverse-dark")
+        lbl_titulo.pack(pady=(20, 10))
 
         # ID de equipo formal
-        lbl_device = tk.Label(self.panel, text=f"Equipo: {device_id}", font=("Helvetica", 12), bg=PANEL_COLOR, fg=TEXT_MUTED)
+        lbl_device = ttkb.Label(self.panel, text=f"Equipo: {device_id}", font=("Helvetica", 12), bootstyle="inverse-dark")
         lbl_device.pack(pady=(0, 25))
 
         # Estado formal
-        self.lbl_estado = tk.Label(self.panel, text="¿Qué deseas hacer a continuación?", font=("Helvetica", 13), bg=PANEL_COLOR, fg=TEXT_MAIN)
+        self.lbl_estado = ttkb.Label(self.panel, text="¿Qué deseas hacer a continuación?", font=("Helvetica", 13), bootstyle="inverse-dark")
         self.lbl_estado.pack(pady=(0, 25))
 
         # Progress bar configuration
-        style = ttk.Style()
-        style.theme_use("clam")
-        style.configure("TProgressbar", thickness=15, background=BTN_PRIMARY, troughcolor=BG_COLOR, bordercolor=PANEL_COLOR, lightcolor=BTN_PRIMARY, darkcolor=BTN_PRIMARY)
-        
-        self.progress = ttk.Progressbar(self.panel, mode="determinate", length=500, style="TProgressbar", maximum=100)
+        self.progress = ttkb.Progressbar(self.panel, mode="determinate", length=500, bootstyle="info-striped", maximum=100)
         self.progress.pack(pady=(0, 40))
         self.progress.config(value=0)
 
         # Frame contenedor de botones
-        self.btn_frame = tk.Frame(self.panel, bg=PANEL_COLOR)
+        self.btn_frame = ttkb.Frame(self.panel, bootstyle="dark")
         self.btn_frame.pack()
 
         # Botón Iniciar formal
-        self.btn_iniciar = tk.Button(
+        self.btn_iniciar = ttkb.Button(
             self.btn_frame, text="Ejecutar Agente", 
-            font=("Helvetica", 12, "bold"), bg=BTN_PRIMARY, fg="white", 
-            activebackground=BTN_PRIMARY_HOVER, activeforeground="white",
-            relief=tk.FLAT, cursor="hand2", padx=30, pady=15, bd=0,
+            bootstyle="primary", cursor="hand2", width=20,
             command=lambda: recolectar_metricas(self)
         )
         self.btn_iniciar.pack(side=tk.LEFT, padx=10)
 
-        # Botón Ir al formulario formal (renombrado a Ver Historial)
-        self.btn_formulario = tk.Button(
-            self.btn_frame, text="Ver Historial", 
-            font=("Helvetica", 12, "bold"), bg=BTN_ACCENT, fg="white", 
-            activebackground=BTN_ACCENT_HOVER, activeforeground="white",
-            relief=tk.FLAT, cursor="hand2", padx=30, pady=15, bd=0,
+        # Botón Ir a Formulario
+        self.btn_formulario = ttkb.Button(
+            self.btn_frame, text="Ir a Formulario", 
+            bootstyle="primary", cursor="hand2", width=20,
             command=self.abrir_formulario
         )
         self.btn_formulario.pack(side=tk.LEFT, padx=10)
-
-        # Custom Hover effects
-        self.bind_hovers(self.btn_iniciar, BTN_PRIMARY, BTN_PRIMARY_HOVER)
-        self.bind_hovers(self.btn_formulario, BTN_ACCENT, BTN_ACCENT_HOVER)
         
         # Iniciar animación
         self.animar_fondo()
@@ -392,13 +330,9 @@ class AgenteApp:
                 
         self.root.after(40, self.animar_fondo)
 
-    def bind_hovers(self, widget, color_normal, color_hover):
-        widget.bind("<Enter>", lambda e: widget.config(bg=color_hover))
-        widget.bind("<Leave>", lambda e: widget.config(bg=color_normal))
-
     def finalizar_exito(self, metricas):
         self.progress.config(value=100)
-        self.lbl_estado.config(text="¡Métricas enviadas correctamente!", fg=SUCCESS_COLOR)
+        self.lbl_estado.config(text="¡Métricas enviadas correctamente!", bootstyle="success")
         
         # Formatear texto de métricas
         bat = metricas.get('battery')
@@ -408,16 +342,17 @@ class AgenteApp:
             bateria_texto = "No disponible"
             
         texto_metricas = (
-            f"📊 CPU: {metricas['cpu']}%\n"
+            f"⏹ CPU: {metricas['cpu']}%\n"
             f"🧠 RAM: {metricas['ram']}%\n"
             f"💾 Disco: {metricas['disk']}% (Uso Activo: {metricas['disk_active']}%)\n"
-            f"🎮 GPU: {metricas['gpu']}%\n"
+            f"⛶ GPU: {metricas['gpu']}%\n"
             f"🔋 Batería: {bateria_texto}"
         )
 
-        lbl_metricas = tk.Label(
+
+        lbl_metricas = ttkb.Label(
             self.panel, text=texto_metricas, font=("Helvetica", 11, "bold"), 
-            bg=BG_COLOR, fg=TEXT_MAIN, justify=tk.CENTER, padx=15, pady=8
+            bootstyle="inverse-dark", justify=tk.CENTER
         )
         lbl_metricas.pack(before=self.btn_frame, pady=(0, 20))
         
@@ -425,18 +360,21 @@ class AgenteApp:
         self.btn_formulario.pack(pady=0) 
 
     def mostrar_error(self, e):
-        self.lbl_estado.config(text="Error durante la recolección.", fg=ERROR_COLOR)
-        self.btn_iniciar.config(state=tk.NORMAL, bg=BTN_PRIMARY, fg="white")
-        self.bind_hovers(self.btn_iniciar, BTN_PRIMARY, BTN_PRIMARY_HOVER)
+        self.lbl_estado.config(text="Error durante la recolección.", bootstyle="danger")
+        self.btn_iniciar.config(state=tk.NORMAL, cursor="hand2")
         messagebox.showerror("Error", f"Ocurrió un error:\n{str(e)}")
 
     def abrir_formulario(self):
-        # Envía el token al navegador para que éste auto inicie sesión si lo soporta.
-        # En caso de que no tenga sesión web, lo iniciará con el token.
         url_formulario = f"https://ramedio.duckdns.org/?device_id={device_id}&token={self.auth_token}"
         webbrowser.open(url_formulario)
 
 if __name__ == "__main__":
-    root = tk.Tk()
+    import ctypes
+    # Evitar bordes pixelados en Windows
+    try:
+        ctypes.windll.shcore.SetProcessDpiAwareness(1)
+    except Exception:
+        pass
+    root = ttkb.Window(themename="darkly", title="RAMedio - Agente de Diagnóstico", size=(1100, 750))
     app = AgenteApp(root)
     root.mainloop()

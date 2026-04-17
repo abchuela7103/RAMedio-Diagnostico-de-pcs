@@ -147,6 +147,7 @@ h1 {
     font-weight: 700;
     background: linear-gradient(to right, #fff, var(--text-muted));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: -1px;
 }
@@ -210,12 +211,7 @@ label {
     font-size: 0.95rem;
 }
 
-/* Radio Cards */
-.question-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
+/* Radio Cards Bootstrap Grid Implementation */
 
 .question-card {
     background: rgba(255, 255, 255, 0.03);
