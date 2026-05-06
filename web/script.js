@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Función para auto-detectar Device ID desde URL o caché local
     function fetchDeviceId() {
         const urlParams = new URLSearchParams(window.location.search);
-        
+
         // --- AUTH LOGIC ---
         const urlToken = urlParams.get('token');
         if (urlToken) {
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             deviceIdInput.value = "";
         }
-        
+
         // Bloquear permanentemente su edición para respetar la auto-detección
         deviceIdInput.placeholder = "Detectando ID del equipo...";
         deviceIdInput.setAttribute('readonly', 'true');
@@ -59,6 +59,118 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Llamar a la función al cargar la página
     fetchDeviceId();
+
+    // --- Lógica de Paginación ---
+    let currentStep = 1;
+    const totalSteps = 3;
+    const nextBtn = document.getElementById('next-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    const submitBtnWrapper = document.getElementById('submit-btn');
+    const progressBar = document.getElementById('form-progress-bar');
+    const stepIndicator = document.getElementById('step-indicator');
+    const stepDesc = document.getElementById('step-desc');
+
+    const stepDescriptions = [
+        "Rendimiento y Energía",
+        "Pantalla y Sistema",
+        "Hardware y Red"
+    ];
+
+    function updateStep() {
+        // Update Progress Bar
+        const progress = (currentStep / totalSteps) * 100;
+        if (progressBar) {
+            progressBar.style.width = `${progress}%`;
+            progressBar.setAttribute('aria-valuenow', progress);
+        }
+
+        // Update Text
+        if (stepIndicator) stepIndicator.textContent = `Paso ${currentStep} de ${totalSteps}`;
+        if (stepDesc) stepDesc.textContent = stepDescriptions[currentStep - 1];
+
+        // Toggle Steps visibility
+        for (let i = 1; i <= totalSteps; i++) {
+            const stepEl = document.getElementById(`step-${i}`);
+            if (!stepEl) continue;
+            if (i === currentStep) {
+                stepEl.classList.remove('hidden', 'hidden-left');
+                stepEl.classList.add('active');
+            } else if (i < currentStep) {
+                stepEl.classList.remove('active', 'hidden');
+                stepEl.classList.add('hidden-left');
+            } else {
+                stepEl.classList.remove('active', 'hidden-left');
+                stepEl.classList.add('hidden');
+            }
+        }
+
+        // Toggle Buttons
+        if (prevBtn && nextBtn && submitBtnWrapper) {
+            if (currentStep === 1) {
+                prevBtn.classList.add('hidden');
+            } else {
+                prevBtn.classList.remove('hidden');
+            }
+
+            if (currentStep === totalSteps) {
+                nextBtn.classList.add('hidden');
+                submitBtnWrapper.classList.remove('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+                submitBtnWrapper.classList.add('hidden');
+            }
+        }
+    }
+
+    // Validate current step before proceeding
+    function validateStep(stepIndex) {
+        const stepEl = document.getElementById(`step-${stepIndex}`);
+        if (!stepEl) return true;
+        const requiredInputs = stepEl.querySelectorAll('input[required]');
+
+        const groups = new Set();
+        requiredInputs.forEach(input => groups.add(input.name));
+
+        let allValid = true;
+        groups.forEach(groupName => {
+            const checked = stepEl.querySelector(`input[name="${groupName}"]:checked`);
+            if (!checked) {
+                allValid = false;
+                const cards = stepEl.querySelectorAll('.question-card');
+                cards.forEach(card => {
+                    if (card.querySelector(`input[name="${groupName}"]`)) {
+                        card.style.borderColor = '#ef4444';
+                        card.style.transform = 'scale(1.02)';
+                        setTimeout(() => {
+                            card.style.borderColor = '';
+                            card.style.transform = '';
+                        }, 500);
+                    }
+                });
+            }
+        });
+
+        return allValid;
+    }
+
+    if (nextBtn && prevBtn) {
+        nextBtn.addEventListener('click', () => {
+            if (!validateStep(currentStep)) return;
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateStep();
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStep();
+            }
+        });
+
+        updateStep();
+    }
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -244,5 +356,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Volver a autocompletar el Device ID después del reset
         fetchDeviceId();
+
+        // Reset Pagination
+        if (typeof currentStep !== "undefined") {
+            currentStep = 1;
+            updateStep();
+        }
     });
 });
