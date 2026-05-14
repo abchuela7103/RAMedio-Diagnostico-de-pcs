@@ -5,14 +5,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAMedio - Dashboard</title>
-    <!-- Modern Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Modern Font and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/darkly/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 
     <!-- Apache ECharts -->
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
     <style>
+        /* ══ TOKENS ══ */
+        :root {
+            --bg:          #060f1c;
+            --bg-card:     rgba(11, 25, 41, 0.6);
+            --bg-inner:    rgba(14, 32, 56, 0.5);
+            --primary:     #2d8cf0;
+            --primary-lt:  #58b3ff;
+            --primary-dk:  #1565c0;
+            --accent:      #06d6f5;
+            --green:       #22d3a0;
+            --amber:       #f59e0b;
+            --red:         #f87171;
+            --txt:         #d4e9ff;
+            --txt-soft:    #9dbedd;
+            --txt-muted:   #5e85ab;
+            --border:      rgba(56,139,253,.2);
+            --border-soft: rgba(56,139,253,.15);
+            --shadow-sm:   0 2px 8px rgba(0,20,60,.3);
+            --shadow-md:   0 8px 28px rgba(0,30,90,.35);
+            --shadow-lg:   0 12px 48px rgba(0,50,140,.28);
+            --r-card:      24px;
+            --r-btn:       16px;
+            --r-inner:     16px;
+        }
+
+        body {
+            background: var(--bg);
+            background-image:
+                radial-gradient(ellipse 90% 55% at 50% -10%, rgba(10,55,130,.45) 0%, transparent 70%),
+                radial-gradient(ellipse 35% 35% at 90% 85%, rgba(0,150,210,.1) 0%, transparent 55%);
+            min-height: 100vh;
+            font-family: 'Nunito', sans-serif;
+            color: var(--txt);
+        }
+
+        .glass-card {
+            background: var(--bg-card) !important;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-soft) !important;
+            border-radius: var(--r-card) !important;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .glass-card-inner {
+            background: var(--bg-inner) !important;
+            border: 1.5px solid var(--border-soft) !important;
+            border-radius: var(--r-inner) !important;
+            transition: border-color .3s, box-shadow .3s, transform .3s;
+        }
+        .glass-card-inner:hover {
+            border-color: rgba(6, 214, 245, 0.4) !important;
+            box-shadow: 0 0 20px rgba(6, 214, 245, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary-full {
+            width: 100%;
+            height: 54px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dk));
+            color: #fff;
+            font-size: 1.02rem;
+            font-weight: 800;
+            box-shadow: 0 4px 22px rgba(45,140,240,.4);
+            border-radius: var(--r-btn);
+            border: none;
+            font-family: 'Nunito', sans-serif;
+            cursor: pointer;
+            transition: all .22s cubic-bezier(.4,0,.2,1);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            text-decoration: none;
+        }
+        .btn-primary-full:hover {
+            background: linear-gradient(135deg, var(--primary-lt), var(--primary));
+            box-shadow: 0 8px 32px rgba(45,140,240,.55);
+            transform: translateY(-2px);
+            color: #fff;
+        }
+
+        .btn-outline-full {
+            width: 100%;
+            height: 52px;
+            background: rgba(45,140,240,.07);
+            border: 1.5px solid rgba(45,140,240,.3);
+            color: var(--txt-soft);
+            font-size: .95rem;
+            font-weight: 700;
+            border-radius: var(--r-btn);
+            font-family: 'Nunito', sans-serif;
+            cursor: pointer;
+            transition: all .22s cubic-bezier(.4,0,.2,1);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            text-decoration: none;
+        }
+        .btn-outline-full:hover {
+            background: rgba(45,140,240,.14);
+            border-color: rgba(45,140,240,.5);
+            color: var(--primary-lt);
+        }
+
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -108,75 +209,72 @@
     </style>
 </head>
 
-<body style="background-color: #222;">
-    <!-- Eliminada la animación de fondo para emparejar la rigidez plana del Agente Escitorio -->
+<body class="dashboard-body">
 
     <div class="container-fluid py-4" style="max-width: 1500px;">
         <div class="row g-4">
             <!-- Sidebar para Equipos del Usuario -->
-            <aside class="col-lg-3 col-md-4">
-                <div class="card p-4 h-100 position-sticky rounded-0 border-0" style="top: 20px; background-color: #303030;">
-                    <h3 class="text-light text-center mb-4" style="font-size: 1.2rem;">Mis Equipos</h3>
+            <aside class="col-lg-3 col-md-4 stagger-1">
+                <div class="card p-4 h-100 position-sticky border-0 glass-card" style="top: 20px;">
+                    <h3 class="text-light text-center mb-4" style="font-size: 1.2rem; font-family: 'Nunito', sans-serif; font-weight: 800;">Mis Equipos</h3>
                     <div id="device-list" class="d-flex flex-column gap-2 mb-4">
-                        <p class="text-center" style="color: #acc; font-size: 0.9rem;">Cargando dispositivos...</p>
+                        <div class="skeleton skeleton-btn"></div>
+                        <div class="skeleton skeleton-btn"></div>
+                        <div class="skeleton skeleton-btn"></div>
                     </div>
 
-                    <a href="index.html" class="btn btn-primary rounded-0 w-100 mb-3">Ir al Formulario web</a>
-                    <a href="history.html" class="btn btn-primary rounded-0 w-100 mb-3">Ver Historial</a>
+                    <a href="index.html" class="btn-primary-full mb-3"><i class="fa-solid fa-clipboard-list"></i> Formulario web</a>
+                    <a href="history.html" class="btn-primary-full mb-3"><i class="fa-solid fa-clock-rotate-left"></i> Ver Historial</a>
 
-                    <button id="logout-btn" class="btn btn-outline-danger rounded-0 w-100 mb-3 text-light border-secondary hover-danger"
-                        style="background-color: transparent;">Cerrar Sesión</button>
+                    <button id="logout-btn" class="btn-outline-full mt-auto"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
                 </div>
             </aside>
 
             <!-- Contenido Principal -->
             <main class="col-lg-9 col-md-8">
-                <div class="card p-4 h-100 rounded-0 border-0" style="background-color: #303030;">
-                    <header class="text-center">
-                        <h2 class="text-light fw-bold" style="letter-spacing: 1px;">RAMedio Dashboard</h2>
-                        <p class="text-muted">Monitoreo y Auditoría de Dispositivos Remotos</p>
+                <div class="card p-4 h-100 border-0 glass-card">
+                    <header class="text-center mb-4">
+                        <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
+                            <div class="logo-icon" style="width: 45px; height: 45px; border-radius: 12px; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 0 15px rgba(45,140,240,.6);">
+                                <i class="fa-solid fa-stethoscope" style="color: white;"></i>
+                            </div>
+                            <h2 class="fw-bold mb-0" style="font-family: 'Nunito', sans-serif; background: linear-gradient(90deg, var(--primary-lt), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">RAMedio Dashboard</h2>
+                        </div>
+                        <p class="text-muted" style="color: var(--txt-soft) !important;">Monitoreo y Auditoría de Dispositivos Remotos</p>
                     </header>
 
                     <div class="input-group text-center mx-auto" style="max-width: 400px; padding-bottom: 20px;">
                         <input type="text" id="dashboard_device_id" placeholder="Ingresa ID de Computadora..." readonly
-                            class="form-control rounded-0 bg-dark text-light border-secondary text-center">
+                            class="form-control bg-dark text-light border-secondary text-center" style="border-radius: var(--r-inner); background: var(--bg-inner) !important; border-color: var(--border-soft) !important;">
                         <button id="load_metrics_btn" style="display: none;">Cargar Telemetría</button>
                     </div>
 
                     <div class="row g-4 mt-2">
                         <!-- Hardware History (Line) -->
-                        <div class="col-12">
-                            <h3>Historial de Rendimiento en Tiempo Real</h3>
+                        <div class="col-12 stagger-2">
+                            <h3 style="color: var(--txt);">Historial de Rendimiento en Tiempo Real</h3>
                             <div id="hardware-chart" style="width: 100%; height: 350px;"></div>
                         </div>
 
-                        <!-- Model Accuracy (Gauge) -->
-                        <div class="col-lg-6 col-12">
-                            <div class="card rounded-0 border-secondary h-100 p-3" style="background-color: #2a2a2a;">
-                                <h3>Precisión General del Algoritmo</h3>
-                                <div id="accuracy-gauge" style="width: 100%; height: 350px;"></div>
-                            </div>
-                        </div>
-
                         <!-- Model Probabilities (Bar Chart) -->
-                        <div class="col-lg-6 col-12">
-                            <div class="card rounded-0 border-secondary h-100 p-3" style="background-color: #2a2a2a;">
-                                <h3>Análisis Predictivo Detallado</h3>
+                        <div class="col-12 stagger-4">
+                            <div class="card h-100 p-3 glass-card-inner">
+                                <h3 style="color: var(--txt);">Análisis Predictivo Detallado</h3>
                                 <h2 id="current-diagnosis-text"
-                                    style="text-align:center; color:#00f2fe; margin-top: -10px; margin-bottom: 5px;">
+                                    style="text-align:center; color: var(--accent); margin-top: -10px; margin-bottom: 5px; font-weight: 800;">
                                     Calculando...</h2>
                                 <p id="current-solution-text"
-                                    style="text-align:center; color:#acc; margin-bottom: 20px; font-size: 1.05rem; display: none; margin-top: 5px;">
+                                    style="text-align:center; color: var(--txt-soft); margin-bottom: 20px; font-size: 1.05rem; display: none; margin-top: 5px;">
                                 </p>
                                 <div id="proba-chart" style="width: 100%; height: 350px;"></div>
                             </div>
                         </div>
 
                         <!-- Decision Tree (Tree) -->
-                        <div class="col-12 mt-4">
-                            <div class="card rounded-0 border-secondary p-3" style="background-color: #2a2a2a;">
-                                <h3>Estructura Lógica del Árbol de Decisión (Caja Blanca)</h3>
-                                <p style="text-align: center; color: #acc; font-size: 0.9rem; margin-top: -10px; margin-bottom: 10px;">
+                        <div class="col-12 mt-4 stagger-5">
+                            <div class="card p-3 glass-card-inner">
+                                <h3 style="color: var(--txt);">Estructura Lógica del Árbol de Decisión (Caja Blanca)</h3>
+                                <p style="text-align: center; color: var(--txt-muted); font-size: 0.9rem; margin-top: -10px; margin-bottom: 10px;">
                                     Puedes hacer clic en los nodos circulares para expandir o colapsar las
                                     sub-reglas, y usar el ratón para hacer zoom/paneo.
                                 </p>

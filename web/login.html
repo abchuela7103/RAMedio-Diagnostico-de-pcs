@@ -4,10 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAMedio - Iniciar Sesión</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Modern Font and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/darkly/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <style>
+        /* ══ TOKENS ══ */
+        :root {
+            --bg:          #060f1c;
+            --bg-card:     rgba(11, 25, 41, 0.6);
+            --bg-inner:    rgba(14, 32, 56, 0.5);
+            --primary:     #2d8cf0;
+            --primary-lt:  #58b3ff;
+            --primary-dk:  #1565c0;
+            --accent:      #06d6f5;
+            --green:       #22d3a0;
+            --amber:       #f59e0b;
+            --red:         #f87171;
+            --txt:         #d4e9ff;
+            --txt-soft:    #9dbedd;
+            --txt-muted:   #5e85ab;
+            --border:      rgba(56,139,253,.2);
+            --border-soft: rgba(56,139,253,.15);
+            --shadow-sm:   0 2px 8px rgba(0,20,60,.3);
+            --shadow-md:   0 8px 28px rgba(0,30,90,.35);
+            --shadow-lg:   0 12px 48px rgba(0,50,140,.28);
+            --r-card:      24px;
+            --r-btn:       16px;
+            --r-inner:     16px;
+        }
+
+        body {
+            background: var(--bg);
+            background-image:
+                radial-gradient(ellipse 90% 55% at 50% -10%, rgba(10,55,130,.45) 0%, transparent 70%),
+                radial-gradient(ellipse 35% 35% at 90% 85%, rgba(0,150,210,.1) 0%, transparent 55%);
+            min-height: 100vh;
+            font-family: 'Nunito', sans-serif;
+            color: var(--txt);
+        }
+
+        .glass-card {
+            background: var(--bg-card) !important;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-soft) !important;
+            border-radius: var(--r-card) !important;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary-full {
+            width: 100%;
+            height: 54px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dk));
+            color: #fff;
+            font-size: 1.02rem;
+            font-weight: 800;
+            box-shadow: 0 4px 22px rgba(45,140,240,.4);
+            border-radius: var(--r-btn);
+            border: none;
+            font-family: 'Nunito', sans-serif;
+            cursor: pointer;
+            transition: all .22s cubic-bezier(.4,0,.2,1);
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            text-decoration: none;
+        }
+        .btn-primary-full:hover {
+            background: linear-gradient(135deg, var(--primary-lt), var(--primary));
+            box-shadow: 0 8px 32px rgba(45,140,240,.55);
+            transform: translateY(-2px);
+            color: #fff;
+        }
+
         .login-container {
             max-width: 400px;
             margin: 2rem auto;
@@ -57,30 +126,35 @@
         }
     </style>
 </head>
-<body class="d-flex align-items-center justify-content-center vh-100" style="background-color: #222;">
-    <main class="card p-4 p-md-5 rounded-0 border-0" style="width: 100%; max-width: 500px; background-color: #303030;">
+<body class="d-flex align-items-center justify-content-center vh-100">
+    <main class="card p-4 p-md-5 border-0 glass-card" style="width: 100%; max-width: 500px;">
         <header class="text-center mb-4">
-            <h2 class="text-light fw-bold" style="letter-spacing: 1px;">RAMedio Login</h2>
+            <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
+                <div class="logo-icon" style="width: 45px; height: 45px; border-radius: 12px; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 0 15px rgba(45,140,240,.6);">
+                    <i class="fa-solid fa-stethoscope" style="color: white;"></i>
+                </div>
+                <h2 class="fw-bold mb-0" style="font-family: 'Nunito', sans-serif; background: linear-gradient(90deg, var(--primary-lt), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">RAMedio Login</h2>
+            </div>
         </header>
 
         <form id="auth-form">
             <div class="mb-4 text-center">
-                <label for="username" class="form-label text-light fs-5">Usuario:</label>
-                <input type="text" id="username" name="username" class="form-control rounded-0 bg-dark text-light border-secondary" required>
+                <label for="username" class="form-label text-light fs-5" style="font-family: 'Nunito', sans-serif; font-weight: 700;">Usuario:</label>
+                <input type="text" id="username" name="username" class="form-control bg-dark text-light border-secondary text-center" style="border-radius: var(--r-inner); background: var(--bg-inner) !important; border-color: var(--border-soft) !important; font-family: 'Nunito', sans-serif;" required>
             </div>
             
             <div class="mb-4 text-center">
-                <label for="password" class="form-label text-light fs-5">Contraseña:</label>
-                <input type="password" id="password" name="password" class="form-control rounded-0 bg-dark text-light border-secondary" required>
+                <label for="password" class="form-label text-light fs-5" style="font-family: 'Nunito', sans-serif; font-weight: 700;">Contraseña:</label>
+                <input type="password" id="password" name="password" class="form-control bg-dark text-light border-secondary text-center" style="border-radius: var(--r-inner); background: var(--bg-inner) !important; border-color: var(--border-soft) !important; font-family: 'Nunito', sans-serif;" required>
             </div>
 
             <div class="text-center mt-5">
-                <button type="submit" class="btn btn-primary rounded-0 mb-3" id="submit-btn" style="width: 200px; font-weight: 500;">
+                <button type="submit" class="btn-primary-full mb-3 mx-auto" id="submit-btn" style="max-width: 250px;">
                 <span id="btn-text">Iniciar Sesión</span>
                 <div class="loader hidden" id="loader" style="display: inline-block; width: 1.5rem; height: 1.5rem;"></div>
             </button>
             <br>
-            <button type="button" class="btn btn-link text-light text-decoration-none" id="toggle-mode-btn">Registrarse</button>
+            <button type="button" class="btn btn-link text-light text-decoration-none" id="toggle-mode-btn" style="color: var(--txt-muted) !important; font-family: 'Nunito', sans-serif; font-weight: 600;">Registrarse</button>
             </div>
         </form>
     </main>

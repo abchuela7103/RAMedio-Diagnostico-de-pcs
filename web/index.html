@@ -1,252 +1,1233 @@
 <!DOCTYPE html>
-<html lang="es" data-bs-theme="dark">
-
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAMedio - Diagnóstico de PCs</title>
-    <!-- Modern Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/darkly/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAMedio - Diagnóstico de PCs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    /* ══ TOKENS ══ */
+    :root {
+      --bg:          #060f1c;
+      --bg-card:     rgba(11, 25, 41, 0.6);
+      --bg-inner:    rgba(14, 32, 56, 0.5);
+      --primary:     #2d8cf0;
+      --primary-lt:  #58b3ff;
+      --primary-dk:  #1565c0;
+      --accent:      #06d6f5;
+      --green:       #22d3a0;
+      --green-bg:    rgba(34,211,160,.12);
+      --green-bd:    rgba(34,211,160,.3);
+      --amber:       #f59e0b;
+      --amber-bg:    rgba(245,158,11,.12);
+      --amber-bd:    rgba(245,158,11,.35);
+      --red:         #f87171;
+      --red-bg:      rgba(248,113,113,.10);
+      --red-bd:      rgba(248,113,113,.3);
+      --txt:         #d4e9ff;
+      --txt-soft:    #9dbedd;
+      --txt-muted:   #5e85ab;
+      --border:      rgba(56,139,253,.2);
+      --border-soft: rgba(56,139,253,.15);
+      --shadow-sm:   0 2px 8px rgba(0,20,60,.3);
+      --shadow-md:   0 8px 28px rgba(0,30,90,.35);
+      --shadow-lg:   0 12px 48px rgba(0,50,140,.28);
+      --r-card:      24px;
+      --r-btn:       16px;
+      --r-inner:     16px;
+    }
 
-    <!-- Apache ECharts para la Animación Frontal -->
-    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+
+    body {
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse 90% 55% at 50% -10%, rgba(10,55,130,.45) 0%, transparent 70%),
+        radial-gradient(ellipse 35% 35% at 90% 85%, rgba(0,150,210,.1) 0%, transparent 55%);
+      min-height: 100vh;
+      font-family: 'Nunito', sans-serif;
+      color: var(--txt);
+      padding: 32px 16px 80px;
+    }
+
+    /* ══ MAIN CARD ══ */
+    #app {
+      max-width: 680px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--r-card);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    /* ══ HEADER ══ */
+    .app-header {
+      padding: 32px 40px 28px;
+      border-bottom: 1px solid var(--border-soft);
+      background: linear-gradient(160deg, rgba(15,38,80,.8) 0%, rgba(8,24,52,.9) 100%);
+      text-align: center;
+    }
+    .logo-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+    .logo-icon {
+      width: 52px; height: 52px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 22px rgba(45,140,240,.6), 0 6px 20px rgba(0,0,0,.4);
+      animation: gentle-float 4s ease-in-out infinite;
+    }
+    @keyframes gentle-float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-5px); }
+    }
+    h1 {
+      font-family: 'Nunito', sans-serif;
+      font-size: 2rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, var(--primary-lt), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -.5px;
+    }
+    .app-tagline {
+      font-size: .88rem;
+      color: var(--txt-soft);
+      font-weight: 500;
+    }
+
+    /* Trust badges */
+    .trust-row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: .75rem;
+      color: var(--txt-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .trust-item .ti-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      flex-shrink: 0;
+    }
+
+    /* ══ SCREENS ══ */
+    .screen { display:none; animation: fadeUp .38s cubic-bezier(.4,0,.2,1); }
+    .screen.active { display:block; }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(16px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ══ SCREEN 1 – ONBOARDING ══ */
+    #screen-onboard { padding: 40px 40px 44px; }
+
+    .onboard-hero {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .onboard-title {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: var(--txt);
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+    .onboard-title span { color: var(--primary); }
+    .onboard-desc {
+      font-size: .97rem;
+      color: var(--txt-soft);
+      line-height: 1.65;
+      max-width: 480px;
+      margin: 0 auto 20px;
+    }
+
+    .time-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-inner);
+      border: 1.5px solid var(--border);
+      border-radius: 99px;
+      padding: 7px 20px;
+      font-size: .8rem;
+      color: var(--txt-soft);
+      font-weight: 600;
+    }
+    .time-badge span { color: var(--primary); font-weight: 700; }
+
+    .steps-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 36px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .step-card {
+      flex: 1; min-width: 150px; max-width: 185px;
+      background: var(--bg-inner);
+      border: 1.5px solid var(--border-soft);
+      border-radius: var(--r-inner);
+      padding: 22px 14px 18px;
+      text-align: center;
+      transition: transform .2s, box-shadow .2s, border-color .2s;
+    }
+    .step-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 24px rgba(45,140,240,.3), var(--shadow-md);
+      border-color: rgba(45,140,240,.4);
+    }
+    .step-icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .step-title {
+      font-weight: 800;
+      font-size: .9rem;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    .step-desc {
+      font-size: .78rem;
+      color: var(--txt-muted);
+      line-height: 1.5;
+    }
+    .step-arrow {
+      display: flex;
+      align-items: center;
+      color: var(--txt-muted);
+      font-size: 1.3rem;
+      padding-top: 8px;
+      flex-shrink: 0;
+    }
+
+    /* ══ SCREEN 2 – FORM ══ */
+    .device-section { padding: 22px 40px 16px; }
+    .device-detected {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-inner);
+      border: 1.5px solid var(--border-soft);
+      border-radius: var(--r-inner);
+      padding: 12px 18px;
+    }
+    .device-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green), 0 0 0 3px rgba(34,211,160,.15);
+      flex-shrink: 0;
+      animation: blink 2.5s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.35;} }
+    .device-label {
+      font-size: .71rem;
+      color: var(--txt-muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      font-weight: 600;
+    }
+    .device-value {
+      font-size: .9rem;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .divider { height: 1px; background: var(--border-soft); margin: 0 40px; }
+
+    .progress-section { padding: 20px 40px 0; }
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: .8rem;
+      color: var(--txt-muted);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .progress-meta .pct { color: var(--primary); font-weight: 800; }
+    .progress-track {
+      height: 8px;
+      border-radius: 99px;
+      background: var(--bg-inner);
+      border: 1px solid var(--border-soft);
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transition: width .8s cubic-bezier(.34, 1.56, .64, 1);
+      box-shadow: 0 0 10px rgba(45,140,240,.6);
+    }
+
+    /* Symptom counter */
+    .sym-counter {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      margin: 16px 40px 0;
+      border-radius: var(--r-inner);
+      font-size: .85rem;
+      font-weight: 600;
+      transition: background .4s, border-color .4s;
+      border: 1.5px solid transparent;
+    }
+    .sym-counter.level-ok    { background: var(--green-bg);  border-color: var(--green-bd);  color: var(--green); }
+    .sym-counter.level-warn  { background: var(--amber-bg);  border-color: var(--amber-bd);  color: var(--amber); }
+    .sym-counter.level-alert { background: var(--red-bg);    border-color: var(--red-bd);    color: var(--red); }
+    .sym-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+    /* Questions */
+    .questions-wrap { padding: 22px 40px 32px; }
+    .q-step { display:none; animation: slideIn .45s cubic-bezier(.34, 1.56, .64, 1); }
+    .q-step.active { display:block; }
+    @keyframes slideIn {
+      from { opacity:0; transform:translateX(24px); }
+      to   { opacity:1; transform:translateX(0); }
+    }
+
+    .q-card {
+      background: var(--bg-inner);
+      border: 1.5px solid var(--border-soft);
+      border-radius: 20px;
+      padding: 28px 26px 24px;
+      transition: border-color .25s, box-shadow .25s;
+    }
+    .q-card:focus-within {
+      border-color: rgba(45,140,240,.4);
+      box-shadow: 0 0 0 4px rgba(45,140,240,.08), 0 0 18px rgba(45,140,240,.15);
+    }
+    .q-num {
+      font-size: .73rem;
+      font-weight: 800;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 12px;
+    }
+    .q-text {
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: var(--txt);
+      line-height: 1.65;
+      margin-bottom: 24px;
+    }
+
+    /* Answer buttons — visual card style */
+    .ans-group { display: flex; gap: 12px; }
+    .ans-group input[type="radio"] { display: none; }
+    .ans-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px 12px;
+      text-align: center;
+      border-radius: var(--r-btn);
+      border: 2px solid var(--border-soft);
+      background: var(--bg-card);
+      color: var(--txt-soft);
+      font-size: .97rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s cubic-bezier(.4,0,.2,1);
+      user-select: none;
+      box-shadow: var(--shadow-sm);
+    }
+    .ans-btn:hover {
+      background: rgba(45,140,240,.12);
+      border-color: rgba(45,140,240,.4);
+      color: var(--primary-lt);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 18px rgba(45,140,240,.2);
+    }
+    input[type="radio"].ans-yes:checked + .ans-btn {
+      background: rgba(245,158,11,.15);
+      border-color: var(--amber);
+      color: #fcd34d;
+      box-shadow: 0 0 18px rgba(245,158,11,.25);
+      transform: translateY(-2px);
+    }
+    input[type="radio"].ans-no:checked + .ans-btn {
+      background: rgba(34,211,160,.12);
+      border-color: var(--green);
+      color: var(--green);
+      box-shadow: 0 0 14px rgba(34,211,160,.2);
+      transform: translateY(-2px);
+    }
+
+    .nav-btns { display:flex; gap:12px; margin-top:18px; }
+
+    /* ══ BUTTONS ══ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 24px;
+      height: 52px;
+      border: none;
+      border-radius: var(--r-btn);
+      font-family: 'Nunito', sans-serif;
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .22s cubic-bezier(.4,0,.2,1);
+    }
+    .btn:disabled { opacity:.35; cursor:not-allowed; transform:none !important; }
+
+    .btn-back {
+      background: var(--bg-inner);
+      border: 1.5px solid var(--border-soft);
+      color: var(--txt-soft);
+      min-width: 100px;
+    }
+    .btn-back:hover:not(:disabled) {
+      background: rgba(45,140,240,.12);
+      border-color: rgba(45,140,240,.35);
+      color: var(--primary-lt);
+    }
+
+    .btn-next {
+      flex: 1;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dk));
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(45,140,240,.35);
+    }
+    .btn-next:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--primary-lt), var(--primary));
+      box-shadow: 0 6px 24px rgba(45,140,240,.55);
+      transform: translateY(-2px);
+    }
+    .btn-next:active:not(:disabled) { transform: scale(.98); }
+    .btn-next.flash { background: linear-gradient(135deg, var(--accent), var(--primary)) !important; box-shadow: 0 0 28px rgba(6,214,245,.45) !important; }
+
+    .btn-submit {
+      flex: 1;
+      background: linear-gradient(135deg, #10B981, #059669);
+      color: #fff;
+      font-weight: 800;
+      font-size: 1rem;
+      height: 52px;
+      box-shadow: 0 4px 20px rgba(16,185,129,.3);
+    }
+    .btn-submit:hover:not(:disabled) {
+      background: linear-gradient(135deg, #34D399, #10B981);
+      box-shadow: 0 6px 28px rgba(16,185,129,.45);
+      transform: translateY(-2px);
+    }
+
+    .btn-primary-full {
+      width: 100%;
+      height: 54px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dk));
+      color: #fff;
+      font-size: 1.02rem;
+      font-weight: 800;
+      box-shadow: 0 4px 22px rgba(45,140,240,.4);
+      border-radius: var(--r-btn);
+      border: none;
+      font-family: 'Nunito', sans-serif;
+      cursor: pointer;
+      transition: all .22s cubic-bezier(.4,0,.2,1);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-primary-full:hover {
+      background: linear-gradient(135deg, var(--primary-lt), var(--primary));
+      box-shadow: 0 8px 32px rgba(45,140,240,.55);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline-full {
+      width: 100%;
+      height: 52px;
+      background: rgba(45,140,240,.07);
+      border: 1.5px solid rgba(45,140,240,.3);
+      color: var(--txt-soft);
+      font-size: .95rem;
+      font-weight: 700;
+      border-radius: var(--r-btn);
+      font-family: 'Nunito', sans-serif;
+      cursor: pointer;
+      transition: all .22s cubic-bezier(.4,0,.2,1);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-outline-full:hover {
+      background: rgba(45,140,240,.14);
+      border-color: rgba(45,140,240,.5);
+      color: var(--primary-lt);
+    }
+
+    /* Tip box */
+    .tip-box {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: rgba(45,140,240,.07);
+      border: 1.5px solid rgba(45,140,240,.18);
+      border-radius: var(--r-inner);
+      padding: 12px 16px;
+      margin-top: 14px;
+      font-size: .83rem;
+      color: var(--txt-muted);
+      line-height: 1.55;
+    }
+    .tip-box .tip-icon { flex-shrink: 0; font-size: 1.05rem; }
+
+    /* ══ SCREEN 3 – LOADING ══ */
+    #screen-loading { padding: 64px 40px 72px; text-align: center; }
+    .analyzing-icon {
+      width: 88px; height: 88px;
+      margin: 0 auto 28px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(45,140,240,.15), rgba(6,214,245,.1));
+      border: 2px solid rgba(45,140,240,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem;
+      box-shadow: 0 0 28px rgba(45,140,240,.2);
+      animation: gentle-float 2.5s ease-in-out infinite;
+    }
+    .analyzing-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--txt);
+      margin-bottom: 8px;
+    }
+    .analyzing-step {
+      font-size: .92rem;
+      color: var(--txt-muted);
+      font-weight: 600;
+      min-height: 22px;
+      transition: opacity .3s;
+    }
+    .loading-info {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .loading-assurance {
+      font-size: .8rem;
+      color: var(--txt-muted);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dots-track {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 28px;
+    }
+    .dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: rgba(45,140,240,.25);
+      animation: dotPulse 1.4s ease-in-out infinite;
+    }
+    .dot:nth-child(2){animation-delay:.2s;}
+    .dot:nth-child(3){animation-delay:.4s;}
+    @keyframes dotPulse {
+      0%,80%,100%{ transform:scale(1); background:rgba(45,140,240,.25); }
+      40%         { transform:scale(1.5); background:var(--primary); box-shadow: 0 0 8px var(--primary); }
+    }
+
+    /* ══ SCREEN 4 – RESULT ══ */
+    #screen-result { padding: 36px 40px 44px; }
+    .result-header { text-align: center; margin-bottom: 28px; }
+
+    .result-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      border-radius: 99px;
+      font-size: .88rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      animation: popIn .5s cubic-bezier(.175,.885,.32,1.275);
+    }
+    @keyframes popIn { from{transform:scale(.4);opacity:0;} to{transform:scale(1);opacity:1;} }
+
+    .result-badge.ok    { background: var(--green-bg); border: 2px solid var(--green-bd); color: var(--green); }
+    .result-badge.warn  { background: var(--amber-bg); border: 2px solid var(--amber-bd); color: var(--amber); }
+    .result-badge.alert { background: var(--red-bg);   border: 2px solid var(--red-bd);   color: var(--red); }
+
+    .result-title {
+      font-size: 1.7rem;
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 6px;
+      color: var(--txt);
+    }
+    .result-title.ok    { color: var(--green); }
+    .result-title.warn  { color: #fcd34d; }
+    .result-title.alert { color: var(--red); }
+    .result-sub { font-size: .87rem; color: var(--txt-muted); font-weight: 600; }
+
+    .severity-row { margin-bottom: 26px; }
+    .severity-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: .8rem;
+      color: var(--txt-muted);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .severity-track {
+      height: 10px;
+      border-radius: 99px;
+      background: var(--bg-inner);
+      border: 1px solid var(--border-soft);
+      overflow: hidden;
+    }
+    .severity-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 1s cubic-bezier(.4,0,.2,1) .3s;
+    }
+    .severity-fill.ok    { background: linear-gradient(90deg, var(--green), #6ee7b7); box-shadow: 0 0 10px rgba(34,211,160,.5); }
+    .severity-fill.warn  { background: linear-gradient(90deg, var(--amber), #fcd34d); box-shadow: 0 0 10px rgba(245,158,11,.5); }
+    .severity-fill.alert { background: linear-gradient(90deg, var(--red), #fca5a5);   box-shadow: 0 0 10px rgba(248,113,113,.5); }
+
+    .solution-card {
+      background: var(--bg-inner);
+      border: 1.5px solid var(--border-soft);
+      border-radius: var(--r-inner);
+      padding: 22px 22px 18px;
+      margin-bottom: 22px;
+    }
+    .sc-title {
+      font-size: .75rem;
+      font-weight: 800;
+      color: var(--txt-muted);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: 10px;
+    }
+    .sc-body {
+      font-size: .97rem;
+      color: var(--txt-soft);
+      line-height: 1.65;
+      font-weight: 500;
+    }
+
+    .symptoms-found { margin-bottom: 24px; }
+    .sf-title {
+      font-size: .75rem;
+      color: var(--txt-muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: 12px;
+    }
+    .tags { display:flex; flex-wrap:wrap; gap:8px; }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(248,113,113,.1);
+      border: 1.5px solid rgba(248,113,113,.28);
+      color: #fca5a5;
+      font-size: .78rem;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 99px;
+    }
+    .tag-none {
+      background: var(--green-bg);
+      border: 1.5px solid var(--green-bd);
+      color: var(--green);
+      font-size: .82rem;
+      font-weight: 700;
+      padding: 5px 16px;
+      border-radius: 99px;
+      display: inline-block;
+    }
+
+    #index-tree-chart {
+      width: 100%; height: 360px;
+      display: none;
+      margin-top: 16px;
+      border-radius: var(--r-inner);
+      overflow: hidden;
+      border: 1.5px solid var(--border-soft);
+    }
+
+    .result-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 26px;
+    }
+
+    .assurance-footer {
+      text-align: center;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-soft);
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }    .assurance-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: .75rem;
+      color: var(--txt-muted);
+      font-weight: 700;
+    }
+
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to{transform:rotate(360deg);} }
+    .hidden { display:none !important; }
+
+    /* ══ RESPONSIVE ══ */
+    @media(max-width:580px){
+      .app-header, #screen-onboard, .device-section, .progress-section,
+      .questions-wrap, #screen-loading, #screen-result {
+        padding-left: 20px; padding-right: 20px;
+      }
+      .divider { margin-left:20px; margin-right:20px; }
+      .sym-counter { margin-left:20px; margin-right:20px; }
+      .step-arrow { display:none; }
+      h1 { font-size: 1.65rem; }
+      .onboard-title { font-size: 1.3rem; }
+      .result-title { font-size: 1.3rem; }
+      .trust-row { gap: 12px; }
+    }
+  </style>
 </head>
+<body>
 
-<body style="background-color: #222;">
-    <main class="card rounded-0 border-0 p-4 p-md-5 mx-auto mt-5 mb-5" style="background-color: #303030; max-width: 800px;">
-        <header>
-            <div class="logo-container">
-                <div class="pulse-ring"></div>
-                <h1>RAMedio</h1>
-            </div>
-            <p class="subtitle">Sistema Distribuido de Diagnóstico de PCs</p>
-        </header>
+<div id="app">
 
-        <form id="diagnosis-form">
-            <section class="form-group primary-input">
-                <label for="device_id">ID del Equipo (Auto-Detectado) <span class="required">*</span></label>
-                <input type="text" id="device_id" name="device_id" class="form-control rounded-0 bg-dark text-light border-secondary text-center" placeholder="Detectando ID del equipo..." readonly
-                    required>
-                <small>Este ID vincula tu reporte con los datos de hardware enviados por el agente RAMedio.</small>
-            </section>
+  <!-- SHARED HEADER -->
+  <header class="app-header">
+    <div class="logo-row">
+      <div class="logo-icon"><i class="fa-solid fa-stethoscope" style="font-size: 1.5rem; color: white;"></i></div>
+      <h1>RAMedio</h1>
+    </div>
+    <p class="app-tagline">Diagnóstico fácil para tu computadora</p>
+    <div class="trust-row">
+      <div class="trust-item"><div class="ti-dot"></div> Tus datos no se comparten</div>
+      <div class="trust-item"><div class="ti-dot"></div> Sin cambios sin tu permiso</div>
+      <div class="trust-item"><div class="ti-dot"></div> 100% seguro</div>
+    </div>
+  </header>
 
-            <div class="divider"></div>
+  <!-- ══ SCREEN 1 – ONBOARDING ══ -->
+  <div id="screen-onboard" class="screen active">
 
-            <section class="symptoms-section">
-                <h2>Cuestionario de Síntomas</h2>
+    <div class="onboard-hero">
+      <div class="onboard-title">¿Tu computadora<br><span>no se siente bien?</span></div>
+      <p class="onboard-desc">
+        Responde unas preguntas sencillas y nuestra IA te dirá exactamente qué puede estar fallando y cómo solucionarlo.
+      </p>
+      <div class="time-badge"><i class="fa-solid fa-stopwatch"></i> <span>~2 minutos</span> &nbsp;·&nbsp; 15 preguntas simples</div>
+    </div>
 
-                <div class="question-grid">
-                    <!-- Q1 -->
-                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
-                        <label>1. ¿Sientes que el equipo está inusualmente lento al abrir programas?</label>
-                        <div class="btn-group d-flex">
-                            <input type="radio" class="btn-check" id="slow_yes" name="is_slow" value="true" required>
-                            <label for="slow_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
+    <div class="steps-row">
+      <div class="step-card">
+        <span class="step-icon"><i class="fa-solid fa-clipboard-list"></i></span>
+        <div class="step-title">Responde</div>
+        <div class="step-desc">15 preguntas sobre cómo se comporta tu equipo</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-card">
+        <span class="step-icon"><i class="fa-solid fa-robot"></i></span>
+        <div class="step-title">La IA analiza</div>
+        <div class="step-desc">Nuestro modelo detecta patrones de falla</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-card">
+        <span class="step-icon"><i class="fa-solid fa-receipt"></i></span>
+        <div class="step-title">Tu diagnóstico</div>
+        <div class="step-desc">Recibes el resultado y los pasos a seguir</div>
+      </div>
+    </div>
 
-                            <input type="radio" class="btn-check" id="slow_no" name="is_slow" value="false">
-                            <label for="slow_no" class="btn btn-outline-info rounded-0 w-100">No</label>
-                        </div>
-                    </div>
+    <button class="btn-primary-full" onclick="startForm()">
+      <i class="fa-solid fa-play"></i> Comenzar diagnóstico
+    </button>
 
-                    <!-- Q2 -->
-                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
-                        <label>2. ¿El equipo se apaga o reinicia solo de forma inesperada?</label>
-                        <div class="btn-group d-flex">
-                            <input type="radio" class="btn-check" id="restart_yes" name="random_restarts" value="true" required>
-                            <label for="restart_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
+    <div class="assurance-footer">
+      <div class="assurance-item"><i class="fa-solid fa-lock"></i> Datos privados</div>
+      <div class="assurance-item"><i class="fa-solid fa-bolt"></i> Menos de 2 minutos</div>
+      <div class="assurance-item"><i class="fa-solid fa-shield-halved"></i> Sin cambios automáticos</div>
+    </div>
 
-                            <input type="radio" class="btn-check" id="restart_no" name="random_restarts" value="false">
-                            <label for="restart_no" class="btn btn-outline-info rounded-0 w-100">No</label>
-                        </div>
-                    </div>
+  </div>
 
-                    <!-- Q3 -->
-                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
-                        <label>3. ¿Escuchas ruidos extraños de ventiladores o discos mecánicos?</label>
-                        <div class="btn-group d-flex">
-                            <input type="radio" class="btn-check" id="noise_yes" name="weird_noises" value="true" required>
-                            <label for="noise_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
-
-                            <input type="radio" class="btn-check" id="noise_no" name="weird_noises" value="false">
-                            <label for="noise_no" class="btn btn-outline-info rounded-0 w-100">No</label>
-                        </div>
-                    </div>
-
-                    <!-- Q4 -->
-                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
-                        <label>4. ¿Has notado que la máquina se calienta demasiado al tacto?</label>
-                        <div class="btn-group d-flex">
-                            <input type="radio" class="btn-check" id="hot_yes" name="overheating" value="true" required>
-                            <label for="hot_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
-
-                            <input type="radio" class="btn-check" id="hot_no" name="overheating" value="false">
-                            <label for="hot_no" class="btn btn-outline-info rounded-0 w-100">No</label>
-                        </div>
-                    </div>
-
-                    <!-- Q5 -->
-                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
-                        <label>5. ¿Aparecen pantallas azules o errores críticos con frecuencia?</label>
-                        <div class="btn-group d-flex">
-                            <input type="radio" class="btn-check" id="bsod_yes" name="bsod_errors" value="true" required>
-                            <label for="bsod_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
-
-                            <input type="radio" class="btn-check" id="bsod_no" name="bsod_errors" value="false">
-                            <label for="bsod_no" class="btn btn-outline-info rounded-0 w-100">No</label>
-                        </div>
-                    </div>
-
-                    <!-- Q6 -->
-                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
-                        <label>6. ¿La pantalla parpadea o se apaga sola?</label>
-                        <div class="btn-group d-flex">
-                            <input type="radio" class="btn-check" id="flicker_yes" name="screen_flicker" value="true" required>
-                            <label for="flicker_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
-
-                            <input type="radio" class="btn-check" id="flicker_no" name="screen_flicker" value="false">
-                            <label for="flicker_no" class="btn btn-outline-info rounded-0 w-100">No</label>
-                        </div>
-                    </div>
-
-                    <!-- Q7 -->
-                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
-                        <label>7. ¿Las aplicaciones se cierran inesperadamente?</label>
-                        <div class="btn-group d-flex">
-                            <input type="radio" class="btn-check" id="apps_yes" name="apps_crashing" value="true" required>
-                            <label for="apps_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
-
-                            <input type="radio" class="btn-check" id="apps_no" name="apps_crashing" value="false">
-                            <label for="apps_no" class="btn btn-outline-info rounded-0 w-100">No</label>
-                        </div>
-                    </div>
-
-                    <!-- Q8 -->
-                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
-                        <label>8. ¿La batería no retiene carga o se descarga rápido?</label>
-                        <div class="btn-group d-flex">
-                            <input type="radio" class="btn-check" id="bat_yes" name="battery_issue" value="true" required>
-                            <label for="bat_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
-
-                            <input type="radio" class="btn-check" id="bat_no" name="battery_issue" value="false">
-                            <label for="bat_no" class="btn btn-outline-info rounded-0 w-100">No</label>
-                        </div>
-                    </div>
-
-                    <!-- Q9 -->
-                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
-                        <label>9. ¿Has percibido algún olor inusual (a quemado)?</label>
-                        <div class="btn-group d-flex">
-                            <input type="radio" class="btn-check" id="smell_yes" name="burnt_smell" value="true" required>
-                            <label for="smell_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
-
-                            <input type="radio" class="btn-check" id="smell_no" name="burnt_smell" value="false">
-                            <label for="smell_no" class="btn btn-outline-info rounded-0 w-100">No</label>
-                        </div>
-                    </div>
-
-                    <!-- Q10 -->
-                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
-                        <label>10. ¿Aparecen cuadros de colores, líneas o la pantalla se deforma al jugar o ver
-                            videos?</label>
-                        <div class="btn-group d-flex">
-                            <input type="radio" class="btn-check" id="art_yes" name="visual_artifacts" value="true" required>
-                            <label for="art_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
-
-                            <input type="radio" class="btn-check" id="art_no" name="visual_artifacts" value="false">
-                            <label for="art_no" class="btn btn-outline-info rounded-0 w-100">No</label>
-                        </div>
-                    </div>
-
-                    <!-- Q11 -->
-                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
-                        <label>11. ¿El equipo se congela por completo pero no se apaga?</label>
-                        <div class="btn-group d-flex">
-                            <input type="radio" class="btn-check" id="freeze_yes" name="system_freezes" value="true" required>
-                            <label for="freeze_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
-
-                            <input type="radio" class="btn-check" id="freeze_no" name="system_freezes" value="false">
-                            <label for="freeze_no" class="btn btn-outline-info rounded-0 w-100">No</label>
-                        </div>
-                    </div>
-
-                    <!-- Q12 -->
-                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
-                        <label>12. ¿Los dispositivos USB se desconectan solos de repente?</label>
-                        <div class="btn-group d-flex">
-                            <input type="radio" class="btn-check" id="usb_yes" name="usb_disconnects" value="true" required>
-                            <label for="usb_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
-
-                            <input type="radio" class="btn-check" id="usb_no" name="usb_disconnects" value="false">
-                            <label for="usb_no" class="btn btn-outline-info rounded-0 w-100">No</label>
-                        </div>
-                    </div>
-
-                    <!-- Q13 -->
-                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
-                        <label>13. ¿La red Wi-Fi o Ethernet se cae a cada rato sin razón?</label>
-                        <div class="btn-group d-flex">
-                            <input type="radio" class="btn-check" id="net_yes" name="network_drops" value="true" required>
-                            <label for="net_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
-
-                            <input type="radio" class="btn-check" id="net_no" name="network_drops" value="false">
-                            <label for="net_no" class="btn btn-outline-info rounded-0 w-100">No</label>
-                        </div>
-                    </div>
-
-                    <!-- Q14 -->
-                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
-                        <label>14. ¿El equipo tarda muchísimo tiempo en dar imagen al encender?</label>
-                        <div class="btn-group d-flex">
-                            <input type="radio" class="btn-check" id="boot_yes" name="slow_boot" value="true" required>
-                            <label for="boot_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
-
-                            <input type="radio" class="btn-check" id="boot_no" name="slow_boot" value="false">
-                            <label for="boot_no" class="btn btn-outline-info rounded-0 w-100">No</label>
-                        </div>
-                    </div>
-
-                    <!-- Q15 -->
-                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
-                        <label>15. ¿Se han dañado archivos misteriosamente o Windows pide revisar el disco al
-                            encender?</label>
-                        <div class="btn-group d-flex">
-                            <input type="radio" class="btn-check" id="corr_yes" name="file_corruption" value="true" required>
-                            <label for="corr_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
-
-                            <input type="radio" class="btn-check" id="corr_no" name="file_corruption" value="false">
-                            <label for="corr_no" class="btn btn-outline-info rounded-0 w-100">No</label>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <button type="submit" class="btn btn-primary w-100 mb-3" id="submit-btn" style="padding: 12px; font-size: 1.1rem; border-radius: 8px;">
-                <span>Enviar Datos de Diagnóstico</span>
-                <div class="loader hidden" style="display: inline-block; width: 1.5rem; height: 1.5rem;"></div>
-            </button>
-        </form>
-
-        <div id="success-message" class="hidden">
-            <div class="success-icon">✓</div>
-            <h3>¡Datos Registrados!</h3>
-
-            <div id="diagnosis-box" class="diagnosis-box hidden">
-                <h4>Diagnóstico de tu equipo</h4>
-                <p id="diagnosis-text" class="diagnosis-text">Analizando...</p>
-                <div id="index-tree-chart" style="width: 100%; height: 400px; display: none; margin-top: 15px;"></div>
-            </div>
-
-            <div class="actions-group" style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-                <button id="go-dashboard-btn" class="btn btn-primary hidden w-100" style="padding: 12px; font-size: 1rem;">Ver Detalles en el Dashboard</button>
-                <button id="reset-btn" class="btn btn-primary w-100" style="padding: 12px; font-size: 1rem;">Enviar otro reporte</button>
-            </div>
+  <!-- ══ SCREEN 2 – FORM ══ -->
+  <div id="screen-form" class="screen">
+    <div class="device-section">
+      <div class="device-detected">
+        <div class="device-dot"></div>
+        <div>
+          <div class="device-label"><i class="fa-solid fa-desktop"></i> Tu equipo fue detectado automáticamente</div>
+          <div class="device-value" id="device-display">Detectando…</div>
         </div>
-    </main>
+      </div>
+      <input type="hidden" id="device_id" name="device_id">
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script.js?v=5"></script>
+    <div class="divider" style="margin-top:16px;"></div>
+
+    <div class="progress-section">
+      <div class="progress-meta">
+        <span id="progress-label">Pregunta 1 de 15</span>
+        <span class="pct" id="progress-pct">7%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:6.67%"></div>
+      </div>
+    </div>
+
+    <div class="sym-counter level-ok" id="sym-counter">
+      <span class="sym-icon" id="sym-icon"><i class="fa-solid fa-shield-halved"></i></span>
+      <span id="sym-text"><b>0 síntomas</b> detectados — ¡todo bien hasta ahora!</span>
+    </div>
+
+    <div class="questions-wrap" id="questions-wrap"></div>
+  </div>
+
+  <!-- ══ SCREEN 3 – LOADING ══ -->
+  <div id="screen-loading" class="screen">
+    <div class="analyzing-icon"><i class="fa-solid fa-brain"></i></div>
+    <div class="analyzing-title">Analizando tu equipo…</div>
+    <div class="analyzing-step" id="analyzing-step">Procesando síntomas…</div>
+    <div class="dots-track">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+    <div class="loading-info">
+      <div class="loading-assurance"><i class="fa-solid fa-lock"></i> Tu información es privada y segura</div>
+      <div class="loading-assurance"><i class="fa-solid fa-bolt"></i> No realizaremos cambios sin tu autorización</div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 4 – RESULT ══ -->
+  <div id="screen-result" class="screen">
+    <div class="result-header">
+      <div class="result-badge" id="result-badge"><i class="fa-solid fa-stethoscope"></i> Diagnóstico listo</div>
+      <div class="result-title" id="result-title">—</div>
+      <div id="certainty-container" style="display:none; font-size: 0.9rem; color: var(--txt-soft); font-weight: 700; margin-bottom: 8px;">
+          <i class="fa-solid fa-brain" style="color: var(--accent);"></i> Certeza de la IA: <span id="certainty-pct"></span>%
+      </div>
+      <div class="result-sub"   id="result-sub"></div>
+    </div>
+
+    <div class="severity-row">
+      <div class="severity-label">
+        <span>Nivel de severidad</span>
+        <span id="severity-pct-label">—</span>
+      </div>
+      <div class="severity-track">
+        <div class="severity-fill" id="severity-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="solution-card">
+      <div class="sc-title"><i class="fa-solid fa-lightbulb"></i> Qué hacer ahora</div>
+      <div class="sc-body" id="solution-text">—</div>
+    </div>
+
+    <div class="symptoms-found">
+      <div class="sf-title">Síntomas que influyeron en el diagnóstico</div>
+      <div class="tags" id="symptom-tags"></div>
+    </div>
+
+    <div id="index-tree-chart"></div>
+
+    <div class="result-actions" id="result-actions-wrapper">
+      <button id="download-pdf-btn" class="btn-primary-full" style="background: linear-gradient(135deg, var(--accent), var(--primary));"><i class="fa-solid fa-file-pdf"></i> Descargar PDF para el Técnico</button>
+      <button id="go-dashboard-btn" class="btn-outline-full hidden"><i class="fa-solid fa-chart-simple"></i> Ver detalles completos en el Dashboard</button>
+      <button id="reset-btn" class="btn-outline-full"><i class="fa-solid fa-rotate-right"></i> Enviar otro reporte</button>
+    </div>
+
+    <div class="assurance-footer">
+      <div class="assurance-item"><i class="fa-solid fa-lock"></i> Tus datos no se comparten</div>
+      <div class="assurance-item"><i class="fa-solid fa-shield-halved"></i> Sin cambios sin tu permiso</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="script.js?v=6"></script>
+<script>
+/* ── DATA ── */
+const QUESTIONS = [
+  {name:'is_slow',         text:'¿Tu equipo está inusualmente lento al abrir programas?',              label:'Lentitud general',       icon:'<i class="fa-solid fa-bolt"></i>', tip:'Esto puede ocurrir cuando hay muchos programas iniciando al encender.'},
+  {name:'random_restarts', text:'¿Tu equipo se apaga o reinicia solo sin que lo pidas?',               label:'Reinicios inesperados',   icon:'<i class="fa-solid fa-rotate-right"></i>', tip:'Los reinicios inesperados suelen estar relacionados con la temperatura o la energía.'},
+  {name:'weird_noises',    text:'¿Escuchas ruidos extraños en los ventiladores o discos?',             label:'Ruidos extraños',         icon:'<i class="fa-solid fa-volume-high"></i>', tip:'Un ventilador ruidoso puede indicar polvo acumulado o falla mecánica.'},
+  {name:'overheating',     text:'¿Tu equipo se calienta mucho al tacto o bajo poca carga?',            label:'Sobrecalentamiento',      icon:'<i class="fa-solid fa-temperature-high"></i>', tip:'El calor excesivo puede reducir el rendimiento y la vida útil del equipo.'},
+  {name:'bsod_errors',     text:'¿Aparecen pantallas azules o errores críticos con frecuencia?',       label:'Pantallas azules (BSOD)', icon:'<i class="fa-solid fa-desktop"></i>', tip:'Las pantallas azules suelen indicar problemas con controladores o memoria RAM.'},
+  {name:'screen_flicker',  text:'¿La pantalla parpadea o se apaga sola mientras trabajas?',            label:'Parpadeo de pantalla',    icon:'<i class="fa-solid fa-wand-magic-sparkles"></i>', tip:'El parpadeo puede deberse a un cable suelto o al controlador de pantalla.'},
+  {name:'apps_crashing',   text:'¿Las aplicaciones se cierran o cuelgan de forma inesperada?',         label:'Apps que fallan',         icon:'<i class="fa-solid fa-burst"></i>', tip:'Esto puede ser señal de poca RAM disponible o archivos del sistema dañados.'},
+  {name:'battery_issue',   text:'¿La batería no retiene carga o se descarga muy rápido?',              label:'Problemas de batería',    icon:'<i class="fa-solid fa-battery-quarter"></i>', tip:'Las baterías tienen ciclos de vida limitados y pueden deteriorarse con el tiempo.'},
+  {name:'burnt_smell',     text:'¿Has notado algún olor raro, como a quemado o plástico caliente?',    label:'Olor a quemado',         icon:'<i class="fa-solid fa-fire"></i>', tip:'Un olor a quemado es una señal seria. Te recomendamos apagar el equipo pronto.'},
+  {name:'visual_artifacts',text:'¿Ves cuadros, líneas o distorsiones en pantalla al jugar o ver videos?', label:'Artefactos visuales', icon:'<i class="fa-solid fa-palette"></i>', tip:'Las distorsiones visuales suelen ser síntoma de la tarjeta gráfica.'},
+  {name:'system_freezes',  text:'¿El equipo se congela por completo y no responde, pero no se apaga?', label:'Congelamiento',           icon:'<i class="fa-solid fa-snowflake"></i>', tip:'Los congelamientos frecuentes pueden indicar RAM insuficiente o falla en el disco.'},
+  {name:'usb_disconnects', text:'¿Los dispositivos USB se desconectan solos de repente?',              label:'USB inestable',           icon:'<i class="fa-solid fa-plug"></i>', tip:'Puede ser un problema de energía en los puertos o del controlador USB.'},
+  {name:'network_drops',   text:'¿Tu red Wi-Fi o Ethernet se cae frecuentemente sin razón aparente?',  label:'Caídas de red',           icon:'<i class="fa-solid fa-wifi"></i>', tip:'Las caídas de red pueden ser del router o del adaptador de red del equipo.'},
+  {name:'slow_boot',       text:'¿Tu equipo tarda muchísimo tiempo en mostrar imagen al encender?',    label:'Arranque muy lento',      icon:'<i class="fa-solid fa-hourglass-half"></i>', tip:'Un arranque lento suele deberse a demasiados programas que se inician solos.'},
+  {name:'file_corruption', text:'¿Se han dañado archivos o Windows pide revisar el disco al encender?',label:'Corrupción de archivos',  icon:'<i class="fa-solid fa-floppy-disk"></i>', tip:'Los archivos dañados pueden indicar un disco duro con sectores en mal estado.'},
+];
+const TOTAL = QUESTIONS.length;
+let answers = {}, yesCount = 0;
+
+/* ── BUILD QUESTIONS ── */
+function buildQuestions() {
+  const wrap = document.getElementById('questions-wrap');
+  wrap.innerHTML = QUESTIONS.map((q,i) => {
+    const n = i+1, isLast = n===TOTAL;
+    return `
+    <div class="q-step${n===1?' active':''}" data-step="${n}">
+      <div class="q-card" id="qcard-${n}">
+        <div class="q-num">${q.icon} Pregunta ${n} de ${TOTAL}</div>
+        <p class="q-text">${q.text}</p>
+        <div class="ans-group">
+          <input type="radio" class="ans-yes" id="q${n}_yes" name="${q.name}" value="true">
+          <label for="q${n}_yes" class="ans-btn">Sí, ocurre</label>
+          <input type="radio" class="ans-no"  id="q${n}_no"  name="${q.name}" value="false">
+          <label for="q${n}_no"  class="ans-btn"> No, normal</label>
+        </div>
+      </div>
+      <div class="tip-box">
+        <span class="tip-icon"><i class="fa-solid fa-lightbulb"></i></span>
+        <span>${q.tip}</span>
+      </div>
+      <div class="nav-btns">
+        <button type="button" class="btn btn-back" ${n===1?'disabled':''} onclick="goBack(${n})">← Atrás</button>
+        ${isLast
+          ? `<button type="button" class="btn btn-submit" onclick="submitForm()">
+               Ver mi diagnóstico ✓
+             </button>`
+          : `<button type="button" class="btn btn-next" id="next-${n}" onclick="goNext(${n})">Siguiente →</button>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+
+  // Auto-advance on selection
+  QUESTIONS.forEach((q,i) => {
+    const n = i+1, isLast = n===TOTAL;
+    ['yes','no'].forEach(side => {
+      document.getElementById(`q${n}_${side}`).addEventListener('change', () => {
+        answers[q.name] = (side==='yes');
+        updateCounter();
+        if (!isLast) setTimeout(() => goNext(n), 460);
+      });
+    });
+  });
+}
+
+/* ── SCREENS ── */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('app').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ── START FORM ── */
+function startForm() {
+  buildQuestions();
+  showScreen('screen-form');
+  fetchDeviceId();
+  updateProgress(1);
+}
+
+/* ── DEVICE ID ── */
+function fetchDeviceId() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlToken  = urlParams.get('token');
+  if (urlToken) {
+    localStorage.setItem('token', urlToken);
+    urlParams.delete('token');
+    window.history.replaceState({}, '', window.location.pathname + (urlParams.toString() ? '?'+urlParams : ''));
+  }
+  if (!localStorage.getItem('token')) { window.location.href = 'login.html'+window.location.search; return; }
+  const urlId = urlParams.get('device_id');
+  let realId  = localStorage.getItem('ramedio_real_device_id');
+  if (urlId) { localStorage.setItem('ramedio_real_device_id', urlId); realId = urlId; }
+  document.getElementById('device_id').value    = realId || '';
+  document.getElementById('device-display').textContent = realId || 'No detectado';
+}
+
+/* ── PROGRESS ── */
+function updateProgress(step) {
+  const pct = Math.round((step/TOTAL)*100);
+  document.getElementById('progress-fill').style.width  = pct+'%';
+  document.getElementById('progress-label').textContent = `Pregunta ${step} de ${TOTAL}`;
+  document.getElementById('progress-pct').textContent   = pct+'%';
+}
+
+/* ── COUNTER ── */
+function updateCounter() {
+  yesCount = Object.values(answers).filter(Boolean).length;
+  const el=document.getElementById('sym-counter'),
+        icon=document.getElementById('sym-icon'),
+        txt=document.getElementById('sym-text');
+  el.classList.remove('level-ok','level-warn','level-alert');
+  if (yesCount===0) {
+    el.classList.add('level-ok'); icon.innerHTML='<i class="fa-solid fa-shield-halved"></i>';
+    txt.innerHTML=`<b>0 síntomas</b> detectados — ¡todo bien hasta ahora!`;
+  } else if (yesCount<=4) {
+    el.classList.add('level-warn'); icon.innerHTML='<i class="fa-solid fa-triangle-exclamation"></i>';
+    txt.innerHTML=`<b>${yesCount} síntoma${yesCount>1?'s':''}</b> detectado${yesCount>1?'s':''} — siguiendo de cerca…`;
+  } else {
+    el.classList.add('level-alert'); icon.innerHTML='<i class="fa-solid fa-circle-exclamation"></i>';
+    txt.innerHTML=`<b>${yesCount} síntomas</b> detectados — podría haber un problema real.`;
+  }
+}
+
+/* ── NAV ── */
+function goNext(cur) {
+  const stepEl = document.querySelector(`.q-step[data-step="${cur}"]`);
+  if (!Array.from(stepEl.querySelectorAll('input[type="radio"]')).some(r=>r.checked)) {
+    const card = document.getElementById(`qcard-${cur}`);
+    card.style.border='2px solid rgba(239,68,68,.5)';
+    card.style.boxShadow='0 0 0 4px rgba(239,68,68,.08)';
+    setTimeout(()=>{card.style.border='';card.style.boxShadow='';},1200);
+    return;
+  }
+  const btn = document.getElementById(`next-${cur}`);
+  if (btn) { btn.classList.add('flash'); setTimeout(()=>btn.classList.remove('flash'),300); }
+  const next = cur+1;
+  if (next>TOTAL) return;
+  stepEl.classList.remove('active');
+  document.querySelector(`.q-step[data-step="${next}"]`).classList.add('active');
+  updateProgress(next);
+  document.getElementById('app').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function goBack(cur) {
+  const prev = cur-1;
+  if (prev<1) return;
+  document.querySelector(`.q-step[data-step="${cur}"]`).classList.remove('active');
+  document.querySelector(`.q-step[data-step="${prev}"]`).classList.add('active');
+  updateProgress(prev);
+  document.getElementById('app').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ── LOADING PHRASES ── */
+const phrases = [
+  'Procesando tus respuestas…',
+  'Consultando el modelo de IA…',
+  'Analizando los síntomas…',
+  'Calculando el diagnóstico…',
+  'Preparando tu resultado…'
+];
+let phraseIdx=0, phraseTimer=null;
+function startLoading() {
+  const el=document.getElementById('analyzing-step');
+  el.textContent=phrases[0]; phraseIdx=1;
+  phraseTimer=setInterval(()=>{
+    el.style.opacity='0';
+    setTimeout(()=>{ el.textContent=phrases[phraseIdx%phrases.length]; el.style.opacity='1'; phraseIdx++; },280);
+  },1800);
+}
+function stopLoading(){ clearInterval(phraseTimer); }
+
+/* ── PRE-LOAD TREE ── */
+let globalTree=null;
+fetch('/api/ml/tree').then(r=>r.json()).then(d=>{globalTree=d.tree;}).catch(()=>{});
+
+/* ── SUBMIT ── */
+async function submitForm() {
+  const lastStep=document.querySelector(`.q-step[data-step="${TOTAL}"]`);
+  if (!Array.from(lastStep.querySelectorAll('input[type="radio"]')).some(r=>r.checked)) {
+    const card=document.getElementById(`qcard-${TOTAL}`);
+    card.style.border='2px solid rgba(239,68,68,.5)';
+    setTimeout(()=>{card.style.border='';},1200);
+    return;
+  }
+  const deviceId=document.getElementById('device_id').value;
+  const payload={
+    device_id:deviceId, timestamp:new Date().toISOString(),
+    symptoms:{
+      is_slow:          answers['is_slow']||false,
+      random_restarts:  answers['random_restarts']||false,
+      weird_noises:     answers['weird_noises']||false,
+      overheating:      answers['overheating']||false,
+      bsod_errors:      answers['bsod_errors']||false,
+      screen_flicker:   answers['screen_flicker']||false,
+      apps_crashing:    answers['apps_crashing']||false,
+      battery_issue:    answers['battery_issue']||false,
+      burnt_smell:      answers['burnt_smell']||false,
+      visual_artifacts: answers['visual_artifacts']||false,
+      system_freezes:   answers['system_freezes']||false,
+      usb_disconnects:  answers['usb_disconnects']||false,
+      network_drops:    answers['network_drops']||false,
+      slow_boot:        answers['slow_boot']||false,
+      file_corruption:  answers['file_corruption']||false,
+    }
+  };
+  showScreen('screen-loading');
+  startLoading();
+  try {
+    const res=await fetch('/api/symptoms',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if (!res.ok) throw new Error();
+    const mlRes=await fetch(`/api/diagnostico/${payload.device_id}`);
+    const mlData=await mlRes.json();
+    stopLoading();
+    renderResult(mlData, payload);
+  } catch(e) {
+    stopLoading();
+    renderResult({error:'No se pudo conectar con el servidor.'}, payload);
+  }
+}
+
+/* ── RENDER RESULT ── */
+function renderResult(mlData, payload) {
+  showScreen('screen-result');
+  const isHealthy = mlData.diagnostico_ml==='Sistema Saludable';
+  const isError   = !!mlData.error;
+  const sevPct    = Math.min(100, Math.round((yesCount/TOTAL)*100*1.4));
+  const level     = isError?'warn': isHealthy?'ok': sevPct>=55?'alert':'warn';
+
+  const badge=document.getElementById('result-badge');
+  badge.className=`result-badge ${level}`;
+  badge.innerHTML=level==='ok'?'<i class="fa-solid fa-circle-check"></i> Sistema saludable':level==='alert'?'<i class="fa-solid fa-circle-exclamation"></i> Requiere atención':'<i class="fa-solid fa-triangle-exclamation"></i> Revisar pronto';
+
+  const title=document.getElementById('result-title');
+  title.className=`result-title ${level}`;
+  title.textContent=isError?'Error de conexión':mlData.diagnostico_ml;
+
+  const certaintyContainer = document.getElementById('certainty-container');
+  if (mlData.probabilidades && !isError) {
+      const maxProba = Math.max(...Object.values(mlData.probabilidades));
+      document.getElementById('certainty-pct').textContent = maxProba;
+      certaintyContainer.style.display = 'block';
+  } else {
+      certaintyContainer.style.display = 'none';
+  }
+
+  document.getElementById('result-sub').textContent=isError?mlData.error:'Diagnóstico generado por el modelo de IA de RAMedio';
+
+  const fill=document.getElementById('severity-fill');
+  fill.className=`severity-fill ${level}`;
+  setTimeout(()=>{ fill.style.width=(isHealthy?8:sevPct)+'%'; },100);
+  document.getElementById('severity-pct-label').textContent=
+    isHealthy?'Sin problemas detectados':`${sevPct}% — ${level==='alert'?'Alto':'Moderado'}`;
+
+  document.getElementById('solution-text').textContent=
+    mlData.solucion||(isError?'Intenta de nuevo más tarde.':'Sin recomendaciones adicionales.');
+
+  const tagsEl=document.getElementById('symptom-tags');
+  const actives=QUESTIONS.filter(q=>answers[q.name]===true);
+  tagsEl.innerHTML=actives.length===0
+    ?`<span class="tag-none"><i class="fa-solid fa-circle-check"></i> Ningún síntoma activo</span>`
+    :actives.map(q=>`<span class="tag">${q.icon} ${q.label}</span>`).join('');
+
+  const dash=document.getElementById('go-dashboard-btn');
+  dash.classList.remove('hidden');
+  dash.onclick=()=>{ window.location.href=`dashboard.html?device_id=${encodeURIComponent(payload.device_id)}`; };
+
+  if (globalTree && mlData.decision_path && !isError) {
+    const chartEl=document.getElementById('index-tree-chart');
+    chartEl.style.display='block';
+    const chart=echarts.init(chartEl);
+    chart.setOption({
+      backgroundColor:'transparent',
+      series:[{
+        type:'tree', data:[globalTree],
+        top:'2%', left:'8%', bottom:'2%', right:'20%',
+        symbolSize:8, roam:true, initialTreeDepth:3,
+        label:{color:'#0F172A',fontSize:12,backgroundColor:'rgba(238,244,255,.9)',padding:[3,6],borderRadius:6},
+        itemStyle:{color:'#2563EB',borderColor:'#38BDF8'},
+        lineStyle:{color:'#CBD5E1',width:2,curveness:.5},
+        animationDuration:300,animationDurationUpdate:500
+      }]
+    });
+    const path=mlData.decision_path;
+    const cloned=JSON.parse(JSON.stringify(globalTree));
+    let step=0;
+    const iv=setInterval(()=>{
+      if(step>=path.length){clearInterval(iv);return;}
+      const active=path.slice(0,step+1), cur=path[step];
+      function styleNode(node){
+        if(active.includes(node.node_id)){
+          node.itemStyle={...(node.itemStyle||{}),color:'#F59E0B',borderColor:'#F59E0B'};
+          node.collapsed=false;
+        }
+        if(node.node_id===cur){node.symbolSize=20;node.label={...(node.label||{}),color:'#B45309',fontWeight:'bold',fontSize:14};}
+        (node.children||[]).forEach(c=>{
+          if(active.includes(c.node_id))c.lineStyle={color:'#F59E0B',width:3};
+          styleNode(c);
+        });
+      }
+      const frame=JSON.parse(JSON.stringify(cloned));
+      styleNode(frame);
+      chart.setOption({series:[{type:'tree',data:[frame]}]});
+      step++;
+    },800);
+  }
+}
+
+/* ── RESET ── */
+document.getElementById('reset-btn').addEventListener('click', ()=>{
+  answers={}; yesCount=0;
+  document.getElementById('index-tree-chart').style.display='none';
+  startForm();
+});
+
+/* ── DOWNLOAD PDF ── */
+document.getElementById('download-pdf-btn').addEventListener('click', function() {
+  const element = document.getElementById('screen-result');
+  const actions = document.getElementById('result-actions-wrapper');
+  actions.style.display = 'none'; // Hide buttons for PDF
+  
+  const opt = {
+    margin:       [10, 0, 10, 0],
+    filename:     'Diagnostico_RAMedio.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#060f1c' },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  
+  html2pdf().set(opt).from(element).save().then(() => {
+     actions.style.display = 'flex'; // Restore buttons
+  });
+});
+</script>
 </body>
-
 </html>

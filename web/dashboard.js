@@ -23,11 +23,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Inicializar contenedores de Gráficos ECharts usando el tema 'dark' predeterminado de echarts
     const hardwareDom = document.getElementById('hardware-chart');
-    const accuracyDom = document.getElementById('accuracy-gauge');
     const treeDom = document.getElementById('tree-chart');
 
     const hardwareChart = echarts.init(hardwareDom, 'dark');
-    const accuracyChart = echarts.init(accuracyDom, 'dark');
     const treeChart = echarts.init(treeDom, 'dark');
 
     // Quitar fondos estáticos propios de ECharts 'dark' para que la transparencia glassmorfsism fluya
@@ -47,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         function styleNode(node) {
             if (activeNodes.includes(node.node_id)) {
-                node.itemStyle = Object.assign({}, node.itemStyle || {}, { color: '#ff4757', borderColor: '#ff4757', shadowBlur: 20, shadowColor: '#ff4757' });
+                node.itemStyle = Object.assign({}, node.itemStyle || {}, { color: '#f87171', borderColor: '#f87171', shadowBlur: 20, shadowColor: '#f87171' });
                 node.collapsed = false; 
             }
             if (node.node_id === currentNodeId) {
@@ -55,12 +53,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 node.itemStyle.color = '#fff';
                 if (!node.label) node.label = {};
                 node.label.color = '#fff';
-                node.label.backgroundColor = '#ff4757';
+                node.label.backgroundColor = '#f87171';
                 node.label.fontWeight = 'bold';
                 node.label.fontSize = 18;
             } else if (activeNodes.includes(node.node_id)) {
                 if (!node.label) node.label = {};
-                node.label.color = '#ff4757';
+                node.label.color = '#f87171';
                 node.label.fontWeight = 'bold';
                 node.label.fontSize = 16;
             }
@@ -68,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (node.children) {
                 node.children.forEach(child => {
                     if (activeNodes.includes(child.node_id)) {
-                        child.lineStyle = { color: '#ff4757', width: 4, type: 'solid', shadowBlur: 10, shadowColor: '#ff4757' };
+                        child.lineStyle = { color: '#f87171', width: 4, type: 'solid', shadowBlur: 10, shadowColor: '#f87171' };
                     }
                     styleNode(child);
                 });
@@ -85,59 +83,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 1. Fetch de los datos del ML (Arbol y Precisión) al cargar la página
     try {
         treeChart.showLoading({text: 'Cargando IA...', color: '#4facfe', maskColor: 'rgba(0,0,0,0.4)'});
-        accuracyChart.showLoading({text: '', maskColor: 'rgba(0,0,0,0.4)'});
         
         const mlResponse = await fetch('/api/ml/tree');
         if (mlResponse.ok) {
             const mlData = await mlResponse.json();
-            
-            // Renderizar el Gauge (Medidor de Precisión)
-            const gaugeOption = {
-                backgroundColor: transparentBg,
-                series: [
-                    {
-                        type: 'gauge',
-                        startAngle: 180,
-                        endAngle: 0,
-                        center: ['50%', '75%'],
-                        radius: '100%',
-                        min: 0,
-                        max: 100,
-                        splitNumber: 10,
-                        axisLine: {
-                            lineStyle: {
-                                width: 20,
-                                color: [
-                                    [0.5, '#ff4757'],  // Rojo (Pobre) >50%
-                                    [0.85, '#ffa502'], // Naranja (Aceptable) >85%
-                                    [1, '#2ed573']     // Verde (Excelente) >100%
-                                ]
-                            }
-                        },
-                        pointer: {
-                            icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z',
-                            length: '15%',
-                            width: 20,
-                            offsetCenter: [0, '-60%'],
-                            itemStyle: { color: 'auto' }
-                        },
-                        axisTick: { length: 15, lineStyle: { color: 'auto', width: 2 } },
-                        splitLine: { length: 25, lineStyle: { color: 'auto', width: 5 } },
-                        axisLabel: { color: '#ccc', distance: 20, fontSize: 12 },
-                        detail: {
-                            fontSize: 50,
-                            offsetCenter: [0, '0%'],
-                            valueAnimation: true,
-                            formatter: '{value}%',
-                            color: 'inherit',
-                            fontWeight: 'bold'
-                        },
-                        data: [{ value: mlData.accuracy, name: 'Score' }]
-                    }
-                ]
-            };
-            accuracyChart.hideLoading();
-            accuracyChart.setOption(gaugeOption);
 
             // Renderizar el Tree Chart (Árbol de Decisión)
             const treeOption = {
@@ -182,11 +131,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                         animationDuration: 550,
                         animationDurationUpdate: 750,
                         itemStyle: {
-                            color: '#1e90ff',
-                            borderColor: '#00f2fe'
+                            color: '#2d8cf0',
+                            borderColor: '#06d6f5'
                         },
                         lineStyle: {
-                            color: '#555',
+                            color: '#5e85ab',
                             width: 2,
                             curveness: 0.5
                         }
@@ -200,7 +149,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch(err) {
         console.error("Error al cargar ML Data:", err);
         treeChart.hideLoading();
-        accuracyChart.hideLoading();
     }
 
     // 2. Fetch y Renderización de la gráfica de Hardware a petición
@@ -240,7 +188,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             smooth: true,
                             data: data.cpu,
                             symbol: 'none',
-                            lineStyle: { width: 3, color: '#ff4757' }
+                            lineStyle: { width: 3, color: '#f87171' }
                         },
                         {
                             name: 'RAM %',
@@ -248,11 +196,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                             smooth: true,
                             data: data.ram,
                             symbol: 'none',
-                            lineStyle: { width: 3, color: '#1e90ff' },
+                            lineStyle: { width: 3, color: '#2d8cf0' },
                             areaStyle: {
                                 color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                    { offset: 0, color: 'rgba(30, 144, 255, 0.6)' },
-                                    { offset: 1, color: 'rgba(30, 144, 255, 0.0)' }
+                                    { offset: 0, color: 'rgba(45, 140, 240, 0.6)' },
+                                    { offset: 1, color: 'rgba(45, 140, 240, 0.0)' }
                                 ])
                             }
                         },
@@ -262,7 +210,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             smooth: true,
                             data: data.disk,
                             symbol: 'none',
-                            lineStyle: { width: 2, color: '#ffa502' }
+                            lineStyle: { width: 2, color: '#f59e0b' }
                         },
                         {
                             name: 'Disco Act. %',
@@ -270,7 +218,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             smooth: true,
                             data: data.disk_active,
                             symbol: 'none',
-                            lineStyle: { width: 2, type: 'dashed', color: '#eccc68' }
+                            lineStyle: { width: 2, type: 'dashed', color: '#fcd34d' }
                         },
                         {
                             name: 'GPU %',
@@ -278,7 +226,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             smooth: true,
                             data: data.gpu,
                             symbol: 'none',
-                            lineStyle: { width: 3, color: '#2ed573' }
+                            lineStyle: { width: 3, color: '#22d3a0' }
                         }
                     ]
                 };
@@ -347,8 +295,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                             barWidth: '50%',
                             itemStyle: {
                                 color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
-                                    { offset: 0, color: '#00f2fe' },
-                                    { offset: 1, color: '#4facfe' }
+                                    { offset: 0, color: '#06d6f5' },
+                                    { offset: 1, color: '#2d8cf0' }
                                 ]),
                                 borderRadius: [0, 5, 5, 0]
                             },
@@ -460,7 +408,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Hacer todos los gráficos responsivos comunes
     window.addEventListener('resize', () => {
         hardwareChart.resize();
-        accuracyChart.resize();
         treeChart.resize();
     });
 });

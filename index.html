@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAMedio - Diagnóstico de PCs</title>
+    <!-- Modern Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/darkly/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Apache ECharts para la Animación Frontal -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+</head>
+
+<body style="background-color: #222;">
+    <main class="card rounded-0 border-0 p-4 p-md-5 mx-auto mt-5 mb-5" style="background-color: #303030; max-width: 800px;">
+        <header>
+            <div class="logo-container">
+                <div class="pulse-ring"></div>
+                <h1>RAMedio</h1>
+            </div>
+            <p class="subtitle">Sistema Distribuido de Diagnóstico de PCs</p>
+        </header>
+
+        <form id="diagnosis-form">
+            <section class="form-group primary-input">
+                <label for="device_id">ID del Equipo (Auto-Detectado) <span class="required">*</span></label>
+                <input type="text" id="device_id" name="device_id" class="form-control rounded-0 bg-dark text-light border-secondary text-center" placeholder="Detectando ID del equipo..." readonly
+                    required>
+                <small>Este ID vincula tu reporte con los datos de hardware enviados por el agente RAMedio.</small>
+            </section>
+
+            <div class="divider"></div>
+
+            <section class="symptoms-section">
+                <h2>Cuestionario de Síntomas</h2>
+
+                <div class="question-grid">
+                    <!-- Q1 -->
+                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
+                        <label>1. ¿Sientes que el equipo está inusualmente lento al abrir programas?</label>
+                        <div class="btn-group d-flex">
+                            <input type="radio" class="btn-check" id="slow_yes" name="is_slow" value="true" required>
+                            <label for="slow_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
+
+                            <input type="radio" class="btn-check" id="slow_no" name="is_slow" value="false">
+                            <label for="slow_no" class="btn btn-outline-info rounded-0 w-100">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
+                        <label>2. ¿El equipo se apaga o reinicia solo de forma inesperada?</label>
+                        <div class="btn-group d-flex">
+                            <input type="radio" class="btn-check" id="restart_yes" name="random_restarts" value="true" required>
+                            <label for="restart_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
+
+                            <input type="radio" class="btn-check" id="restart_no" name="random_restarts" value="false">
+                            <label for="restart_no" class="btn btn-outline-info rounded-0 w-100">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q3 -->
+                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
+                        <label>3. ¿Escuchas ruidos extraños de ventiladores o discos mecánicos?</label>
+                        <div class="btn-group d-flex">
+                            <input type="radio" class="btn-check" id="noise_yes" name="weird_noises" value="true" required>
+                            <label for="noise_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
+
+                            <input type="radio" class="btn-check" id="noise_no" name="weird_noises" value="false">
+                            <label for="noise_no" class="btn btn-outline-info rounded-0 w-100">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q4 -->
+                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
+                        <label>4. ¿Has notado que la máquina se calienta demasiado al tacto?</label>
+                        <div class="btn-group d-flex">
+                            <input type="radio" class="btn-check" id="hot_yes" name="overheating" value="true" required>
+                            <label for="hot_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
+
+                            <input type="radio" class="btn-check" id="hot_no" name="overheating" value="false">
+                            <label for="hot_no" class="btn btn-outline-info rounded-0 w-100">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q5 -->
+                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
+                        <label>5. ¿Aparecen pantallas azules o errores críticos con frecuencia?</label>
+                        <div class="btn-group d-flex">
+                            <input type="radio" class="btn-check" id="bsod_yes" name="bsod_errors" value="true" required>
+                            <label for="bsod_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
+
+                            <input type="radio" class="btn-check" id="bsod_no" name="bsod_errors" value="false">
+                            <label for="bsod_no" class="btn btn-outline-info rounded-0 w-100">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q6 -->
+                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
+                        <label>6. ¿La pantalla parpadea o se apaga sola?</label>
+                        <div class="btn-group d-flex">
+                            <input type="radio" class="btn-check" id="flicker_yes" name="screen_flicker" value="true" required>
+                            <label for="flicker_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
+
+                            <input type="radio" class="btn-check" id="flicker_no" name="screen_flicker" value="false">
+                            <label for="flicker_no" class="btn btn-outline-info rounded-0 w-100">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q7 -->
+                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
+                        <label>7. ¿Las aplicaciones se cierran inesperadamente?</label>
+                        <div class="btn-group d-flex">
+                            <input type="radio" class="btn-check" id="apps_yes" name="apps_crashing" value="true" required>
+                            <label for="apps_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
+
+                            <input type="radio" class="btn-check" id="apps_no" name="apps_crashing" value="false">
+                            <label for="apps_no" class="btn btn-outline-info rounded-0 w-100">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q8 -->
+                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
+                        <label>8. ¿La batería no retiene carga o se descarga rápido?</label>
+                        <div class="btn-group d-flex">
+                            <input type="radio" class="btn-check" id="bat_yes" name="battery_issue" value="true" required>
+                            <label for="bat_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
+
+                            <input type="radio" class="btn-check" id="bat_no" name="battery_issue" value="false">
+                            <label for="bat_no" class="btn btn-outline-info rounded-0 w-100">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q9 -->
+                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
+                        <label>9. ¿Has percibido algún olor inusual (a quemado)?</label>
+                        <div class="btn-group d-flex">
+                            <input type="radio" class="btn-check" id="smell_yes" name="burnt_smell" value="true" required>
+                            <label for="smell_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
+
+                            <input type="radio" class="btn-check" id="smell_no" name="burnt_smell" value="false">
+                            <label for="smell_no" class="btn btn-outline-info rounded-0 w-100">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q10 -->
+                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
+                        <label>10. ¿Aparecen cuadros de colores, líneas o la pantalla se deforma al jugar o ver
+                            videos?</label>
+                        <div class="btn-group d-flex">
+                            <input type="radio" class="btn-check" id="art_yes" name="visual_artifacts" value="true" required>
+                            <label for="art_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
+
+                            <input type="radio" class="btn-check" id="art_no" name="visual_artifacts" value="false">
+                            <label for="art_no" class="btn btn-outline-info rounded-0 w-100">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q11 -->
+                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
+                        <label>11. ¿El equipo se congela por completo pero no se apaga?</label>
+                        <div class="btn-group d-flex">
+                            <input type="radio" class="btn-check" id="freeze_yes" name="system_freezes" value="true" required>
+                            <label for="freeze_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
+
+                            <input type="radio" class="btn-check" id="freeze_no" name="system_freezes" value="false">
+                            <label for="freeze_no" class="btn btn-outline-info rounded-0 w-100">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q12 -->
+                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
+                        <label>12. ¿Los dispositivos USB se desconectan solos de repente?</label>
+                        <div class="btn-group d-flex">
+                            <input type="radio" class="btn-check" id="usb_yes" name="usb_disconnects" value="true" required>
+                            <label for="usb_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
+
+                            <input type="radio" class="btn-check" id="usb_no" name="usb_disconnects" value="false">
+                            <label for="usb_no" class="btn btn-outline-info rounded-0 w-100">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q13 -->
+                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
+                        <label>13. ¿La red Wi-Fi o Ethernet se cae a cada rato sin razón?</label>
+                        <div class="btn-group d-flex">
+                            <input type="radio" class="btn-check" id="net_yes" name="network_drops" value="true" required>
+                            <label for="net_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
+
+                            <input type="radio" class="btn-check" id="net_no" name="network_drops" value="false">
+                            <label for="net_no" class="btn btn-outline-info rounded-0 w-100">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q14 -->
+                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
+                        <label>14. ¿El equipo tarda muchísimo tiempo en dar imagen al encender?</label>
+                        <div class="btn-group d-flex">
+                            <input type="radio" class="btn-check" id="boot_yes" name="slow_boot" value="true" required>
+                            <label for="boot_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
+
+                            <input type="radio" class="btn-check" id="boot_no" name="slow_boot" value="false">
+                            <label for="boot_no" class="btn btn-outline-info rounded-0 w-100">No</label>
+                        </div>
+                    </div>
+
+                    <!-- Q15 -->
+                    <div class="card p-3 mb-3 rounded-0 border-secondary" style="background-color: #2a2a2a;">
+                        <label>15. ¿Se han dañado archivos misteriosamente o Windows pide revisar el disco al
+                            encender?</label>
+                        <div class="btn-group d-flex">
+                            <input type="radio" class="btn-check" id="corr_yes" name="file_corruption" value="true" required>
+                            <label for="corr_yes" class="btn btn-outline-info rounded-0 w-100">Sí</label>
+
+                            <input type="radio" class="btn-check" id="corr_no" name="file_corruption" value="false">
+                            <label for="corr_no" class="btn btn-outline-info rounded-0 w-100">No</label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <button type="submit" class="btn btn-primary w-100 mb-3" id="submit-btn" style="padding: 12px; font-size: 1.1rem; border-radius: 8px;">
+                <span>Enviar Datos de Diagnóstico</span>
+                <div class="loader hidden" style="display: inline-block; width: 1.5rem; height: 1.5rem;"></div>
+            </button>
+        </form>
+
+        <div id="success-message" class="hidden">
+            <div class="success-icon">✓</div>
+            <h3>¡Datos Registrados!</h3>
+
+            <div id="diagnosis-box" class="diagnosis-box hidden">
+                <h4>Diagnóstico de tu equipo</h4>
+                <p id="diagnosis-text" class="diagnosis-text">Analizando...</p>
+                <div id="index-tree-chart" style="width: 100%; height: 400px; display: none; margin-top: 15px;"></div>
+            </div>
+
+            <div class="actions-group" style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                <button id="go-dashboard-btn" class="btn btn-primary hidden w-100" style="padding: 12px; font-size: 1rem;">Ver Detalles en el Dashboard</button>
+                <button id="reset-btn" class="btn btn-primary w-100" style="padding: 12px; font-size: 1rem;">Enviar otro reporte</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js?v=5"></script>
+</body>
+
+</html>
