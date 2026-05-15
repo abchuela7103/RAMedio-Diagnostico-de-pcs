@@ -249,14 +249,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // 3. Fetch y Renderización de Probabilidades ML a petición
-    const loadProbas = async (deviceId) => {
+    const loadProbas = async (deviceId, symptomId = null) => {
         const probaDom = document.getElementById('proba-chart');
         const probaChart = echarts.init(probaDom, 'dark');
         probaChart.showLoading({text: 'Calculando probabilidades...', color: '#4facfe', maskColor: 'rgba(0,0,0,0.4)'});
         
         try {
-            const res = await fetch(`/api/diagnostico/${encodeURIComponent(deviceId)}`);
+            let apiUrl = `/api/diagnostico/${encodeURIComponent(deviceId)}`;
+            if (symptomId) {
+                apiUrl += `?symptom_id=${encodeURIComponent(symptomId)}`;
+            }
+            const res = await fetch(apiUrl);
             const data = await res.json();
+            
+            if (data.error) {
+                document.getElementById('current-diagnosis-text').textContent = data.error;
+                document.getElementById('current-solution-text').style.display = 'none';
+                probaChart.hideLoading();
+                return;
+            }
             
             // Modificar Título principal y Sugerencia
             document.getElementById('current-diagnosis-text').textContent = "Veredicto IA: " + data.diagnostico_ml;
@@ -356,10 +367,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Auto-Cargar si venimos redireccionados desde el formulario (index.html)
     const urlParams = new URLSearchParams(window.location.search);
     const originDeviceId = urlParams.get('device_id');
+    const urlSymptomId = urlParams.get('symptom_id');
     if (originDeviceId) {
         document.getElementById('dashboard_device_id').value = originDeviceId;
         loadHardware(originDeviceId);
-        loadProbas(originDeviceId);
+        loadProbas(originDeviceId, urlSymptomId);
         localStorage.setItem('ramedio_real_device_id', originDeviceId);
         const returnLink = document.getElementById('return-link');
         if (returnLink) {

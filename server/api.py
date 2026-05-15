@@ -135,6 +135,24 @@ def get_user_devices(current_user: User = Depends(get_current_user), db: Session
     devices = db.query(UserDevice).filter(UserDevice.user_id == current_user.id).all()
     return {"devices": [d.device_id for d in devices]}
 
+@app.get("/api/user/scans")
+def get_user_scans(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    devices = db.query(UserDevice).filter(UserDevice.user_id == current_user.id).all()
+    device_ids = [d.device_id for d in devices]
+    if not device_ids:
+        return {"scans": []}
+    
+    scans = db.query(SymptomRecord).filter(SymptomRecord.device_id.in_(device_ids)).order_by(SymptomRecord.timestamp.desc()).all()
+    
+    result = []
+    for s in scans:
+        result.append({
+            "id": s.id,
+            "device_id": s.device_id,
+            "timestamp": s.timestamp.isoformat()
+        })
+    return {"scans": result}
+
 @app.post("/metrics")
 def receive_metrics(data: Metrics, db: Session = Depends(get_db)):
     # Parse the inner metrics dictionary
@@ -185,13 +203,22 @@ def receive_symptoms(data: SymptomPayload, db: Session = Depends(get_db)):
     return {"status": "ok", "message": "Symptoms saved to DB"}
 
 @app.get("/api/diagnostico/{device_id}")
-def run_diagnostics(device_id: str, db: Session = Depends(get_db)):
+def run_diagnostics(device_id: str, symptom_id: int = None, db: Session = Depends(get_db)):
     try:
-        # 1. Obtener la última métrica de hardware
-        latest_metric = db.query(MetricRecord).filter(MetricRecord.device_id == device_id).order_by(MetricRecord.timestamp.desc()).first()
-        
-        # 2. Obtener el último reporte de síntomas web
-        latest_symptoms = db.query(SymptomRecord).filter(SymptomRecord.device_id == device_id).order_by(SymptomRecord.timestamp.desc()).first()
+        if symptom_id is not None:
+            latest_symptoms = db.query(SymptomRecord).filter(SymptomRecord.id == symptom_id, SymptomRecord.device_id == device_id).first()
+            if not latest_symptoms:
+                return {"error": "El escaneo solicitado no fue encontrado."}
+            
+            latest_metric = db.query(MetricRecord).filter(MetricRecord.device_id == device_id, MetricRecord.timestamp <= latest_symptoms.timestamp).order_by(MetricRecord.timestamp.desc()).first()
+            if not latest_metric:
+                latest_metric = db.query(MetricRecord).filter(MetricRecord.device_id == device_id).order_by(MetricRecord.timestamp.asc()).first()
+        else:
+            # 1. Obtener la última métrica de hardware
+            latest_metric = db.query(MetricRecord).filter(MetricRecord.device_id == device_id).order_by(MetricRecord.timestamp.desc()).first()
+            
+            # 2. Obtener el último reporte de síntomas web
+            latest_symptoms = db.query(SymptomRecord).filter(SymptomRecord.device_id == device_id).order_by(SymptomRecord.timestamp.desc()).first()
         
         if not latest_metric:
             return {"error": "No hay datos de hardware para este equipo. Corre el agente (main.py) primero."}
