@@ -144,12 +144,55 @@ def get_user_scans(current_user: User = Depends(get_current_user), db: Session =
     
     scans = db.query(SymptomRecord).filter(SymptomRecord.device_id.in_(device_ids)).order_by(SymptomRecord.timestamp.desc()).all()
     
+    import sys
+    import os
+    if os.path.dirname(os.path.dirname(os.path.abspath(__file__))) not in sys.path:
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from ML.classifier import predict_status_with_proba
+    
     result = []
     for s in scans:
+        latest_metric = db.query(MetricRecord).filter(MetricRecord.device_id == s.device_id, MetricRecord.timestamp <= s.timestamp).order_by(MetricRecord.timestamp.desc()).first()
+        if not latest_metric:
+            latest_metric = db.query(MetricRecord).filter(MetricRecord.device_id == s.device_id).order_by(MetricRecord.timestamp.asc()).first()
+            
+        verdict = "Pendiente"
+        if latest_metric:
+            hardware_data = {
+                "cpu": latest_metric.cpu,
+                "ram": latest_metric.ram,
+                "disk": latest_metric.disk,
+                "disk_active": latest_metric.disk_active,
+                "gpu": latest_metric.gpu
+            }
+            symptoms_data = {
+                "is_slow": s.is_slow,
+                "random_restarts": s.random_restarts,
+                "weird_noises": s.weird_noises,
+                "overheating": s.overheating,
+                "bsod_errors": s.bsod_errors,
+                "screen_flicker": s.screen_flicker,
+                "apps_crashing": s.apps_crashing,
+                "battery_issue": s.battery_issue,
+                "burnt_smell": s.burnt_smell,
+                "visual_artifacts": s.visual_artifacts,
+                "system_freezes": s.system_freezes,
+                "usb_disconnects": s.usb_disconnects,
+                "network_drops": s.network_drops,
+                "slow_boot": s.slow_boot,
+                "file_corruption": s.file_corruption
+            }
+            try:
+                diag = predict_status_with_proba(hardware_data, symptoms_data)
+                verdict = diag["prediction"]
+            except:
+                pass
+                
         result.append({
             "id": s.id,
             "device_id": s.device_id,
-            "timestamp": s.timestamp.isoformat()
+            "timestamp": s.timestamp.isoformat(),
+            "verdict": verdict
         })
     return {"scans": result}
 

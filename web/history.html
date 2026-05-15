@@ -120,6 +120,13 @@
         <div class="card p-4 p-md-5 border-0 glass-card">
             <h3 class="mb-4 text-white border-bottom pb-3" style="border-color: rgba(255,255,255,0.1)!important;">Mis Escaneos e Historial</h3>
             
+            <div class="mb-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary" style="background: var(--bg-inner) !important; border-color: var(--border-soft) !important; color: var(--txt-soft);"><i class="fa-solid fa-search"></i></span>
+                    <input type="text" id="search-input" class="form-control bg-dark text-light border-secondary" placeholder="Buscar por equipo, fecha o veredicto..." style="background: var(--bg-inner) !important; border-color: var(--border-soft) !important; border-radius: 0 var(--r-inner) var(--r-inner) 0;">
+                </div>
+            </div>
+
             <div class="row g-4" id="history-grid">
                 <!-- Javascript will inject cards here -->
                 <div class="col-12 py-5 text-center">

@@ -954,8 +954,6 @@ function buildQuestions() {
       document.getElementById(`q${n}_${side}`).addEventListener('change', () => {
         answers[q.name] = (side==='yes');
         updateCounter();
-        const nextBtn = document.getElementById(`next-${n}`);
-        if (nextBtn) nextBtn.style.display = '';
         if (!isLast) setTimeout(() => goNext(n), 460);
       });
     });
@@ -1036,7 +1034,14 @@ function goNext(cur) {
   const next = cur+1;
   if (next>TOTAL) return;
   stepEl.classList.remove('active');
-  document.querySelector(`.q-step[data-step="${next}"]`).classList.add('active');
+  const nextStepEl = document.querySelector(`.q-step[data-step="${next}"]`);
+  nextStepEl.classList.add('active');
+  
+  if (Array.from(nextStepEl.querySelectorAll('input[type="radio"]')).some(r=>r.checked)) {
+    const nextBtn = document.getElementById(`next-${next}`);
+    if (nextBtn) nextBtn.style.display = '';
+  }
+
   updateProgress(next);
   document.getElementById('app').scrollIntoView({behavior:'smooth',block:'start'});
 }
@@ -1046,6 +1051,10 @@ function goBack(cur) {
   if (prev<1) return;
   document.querySelector(`.q-step[data-step="${cur}"]`).classList.remove('active');
   document.querySelector(`.q-step[data-step="${prev}"]`).classList.add('active');
+  
+  const prevBtn = document.getElementById(`next-${prev}`);
+  if (prevBtn) prevBtn.style.display = '';
+
   updateProgress(prev);
   document.getElementById('app').scrollIntoView({behavior:'smooth',block:'start'});
 }
