@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     /* ══ TOKENS ══ */
     :root {
@@ -878,7 +877,6 @@
     <div id="index-tree-chart"></div>
 
     <div class="result-actions" id="result-actions-wrapper">
-      <button id="download-pdf-btn" class="btn-primary-full" style="background: linear-gradient(135deg, var(--accent), var(--primary));"><i class="fa-solid fa-file-pdf"></i> Descargar PDF para el Técnico</button>
       <button id="go-dashboard-btn" class="btn-outline-full hidden"><i class="fa-solid fa-chart-simple"></i> Ver detalles completos en el Dashboard</button>
       <button id="reset-btn" class="btn-outline-full"><i class="fa-solid fa-rotate-right"></i> Enviar otro reporte</button>
     </div>
@@ -1226,24 +1224,6 @@ document.getElementById('reset-btn').addEventListener('click', ()=>{
   startForm();
 });
 
-/* ── DOWNLOAD PDF ── */
-document.getElementById('download-pdf-btn').addEventListener('click', function() {
-  const element = document.getElementById('screen-result');
-  const actions = document.getElementById('result-actions-wrapper');
-  actions.style.display = 'none'; // Hide buttons for PDF
-  
-  const opt = {
-    margin:       [10, 0, 10, 0],
-    filename:     'Diagnostico_RAMedio.pdf',
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#060f1c' },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-  
-  html2pdf().set(opt).from(element).save().then(() => {
-     actions.style.display = 'flex'; // Restore buttons
-  });
-});
 </script>
 </body>
 </html>
