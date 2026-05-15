@@ -941,7 +941,7 @@ function buildQuestions() {
           ? `<button type="button" class="btn btn-submit" onclick="submitForm()">
                Ver mi diagnóstico ✓
              </button>`
-          : `<button type="button" class="btn btn-next" id="next-${n}" onclick="goNext(${n})">Siguiente →</button>`
+          : `<button type="button" class="btn btn-next" id="next-${n}" onclick="goNext(${n})" style="display: none;">Siguiente →</button>`
         }
       </div>
     </div>`;
@@ -954,6 +954,8 @@ function buildQuestions() {
       document.getElementById(`q${n}_${side}`).addEventListener('change', () => {
         answers[q.name] = (side==='yes');
         updateCounter();
+        const nextBtn = document.getElementById(`next-${n}`);
+        if (nextBtn) nextBtn.style.display = '';
         if (!isLast) setTimeout(() => goNext(n), 460);
       });
     });

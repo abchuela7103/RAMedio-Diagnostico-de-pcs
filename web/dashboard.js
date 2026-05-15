@@ -162,18 +162,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             if(data.timestamps && data.timestamps.length > 0) {
                 const hardwareOption = {
                     backgroundColor: transparentBg,
+                    color: ['#f87171', '#2d8cf0', '#f59e0b', '#fcd34d', '#22d3a0'],
                     tooltip: { 
                         trigger: 'axis',
                         backgroundColor: 'rgba(0, 0, 0, 0.8)',
                         textStyle: { color: '#fff' }
                     },
-                    legend: { data: ['CPU %', 'RAM %', 'Disco %', 'Disco Act. %', 'GPU %'], textStyle: { color: '#ddd' } },
-                    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+                    legend: { 
+                        data: ['CPU %', 'RAM %', 'Disco %', 'Disco Act. %', 'GPU %'], 
+                        textStyle: { color: '#ddd' },
+                        top: 0
+                    },
+                    grid: { left: '3%', right: '4%', bottom: '15%', top: '15%', containLabel: true },
                     xAxis: {
                         type: 'category',
                         boundaryGap: false,
                         data: data.timestamps,
-                        axisLabel: { color: '#aaa' }
+                        axisLabel: { color: '#aaa', rotate: 45, hideOverlap: true }
                     },
                     yAxis: {
                         type: 'value',
@@ -188,7 +193,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             smooth: true,
                             data: data.cpu,
                             symbol: 'none',
-                            lineStyle: { width: 3, color: '#f87171' }
+                            lineStyle: { width: 3 }
                         },
                         {
                             name: 'RAM %',
@@ -196,7 +201,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             smooth: true,
                             data: data.ram,
                             symbol: 'none',
-                            lineStyle: { width: 3, color: '#2d8cf0' },
+                            lineStyle: { width: 3 },
                             areaStyle: {
                                 color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                                     { offset: 0, color: 'rgba(45, 140, 240, 0.6)' },
@@ -210,7 +215,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             smooth: true,
                             data: data.disk,
                             symbol: 'none',
-                            lineStyle: { width: 2, color: '#f59e0b' }
+                            lineStyle: { width: 2 }
                         },
                         {
                             name: 'Disco Act. %',
@@ -218,7 +223,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             smooth: true,
                             data: data.disk_active,
                             symbol: 'none',
-                            lineStyle: { width: 2, type: 'dashed', color: '#fcd34d' }
+                            lineStyle: { width: 2, type: 'dashed' }
                         },
                         {
                             name: 'GPU %',
@@ -226,7 +231,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             smooth: true,
                             data: data.gpu,
                             symbol: 'none',
-                            lineStyle: { width: 3, color: '#22d3a0' }
+                            lineStyle: { width: 3 }
                         }
                     ]
                 };
