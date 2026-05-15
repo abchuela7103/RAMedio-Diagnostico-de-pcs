@@ -13,6 +13,7 @@
 
     <!-- Apache ECharts -->
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         /* ══ TOKENS ══ */
         :root {
@@ -225,13 +226,14 @@
 
                     <a href="index.html" class="btn-primary-full mb-3"><i class="fa-solid fa-clipboard-list"></i> Formulario web</a>
                     <a href="history.html" class="btn-primary-full mb-3"><i class="fa-solid fa-clock-rotate-left"></i> Ver Historial</a>
+                    <button class="btn-outline-full mb-3" style="color: #2d8cf0; border-color: rgba(45,140,240,.3); font-weight: 800;" onclick="downloadDashboardPDF()"><i class="fa-solid fa-file-pdf"></i> Descargar PDF Técnico</button>
 
                     <button id="logout-btn" class="btn-outline-full mt-auto"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
                 </div>
             </aside>
 
             <!-- Contenido Principal -->
-            <main class="col-lg-9 col-md-8">
+            <main class="col-lg-9 col-md-8" id="dashboard-content">
                 <div class="card p-4 h-100 border-0 glass-card">
                     <header class="text-center mb-4">
                         <div class="d-flex align-items-center justify-content-center gap-3 mb-2">

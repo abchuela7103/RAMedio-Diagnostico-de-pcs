@@ -938,7 +938,7 @@ function buildQuestions() {
       <div class="nav-btns">
         <button type="button" class="btn btn-back" ${n===1?'disabled':''} onclick="goBack(${n})">← Atrás</button>
         ${isLast
-          ? `<button type="button" class="btn btn-submit" onclick="submitForm()">
+          ? `<button type="button" class="btn btn-submit" id="submit-btn" onclick="submitForm()" style="display: none;">
                Ver mi diagnóstico ✓
              </button>`
           : `<button type="button" class="btn btn-next" id="next-${n}" onclick="goNext(${n})" style="display: none;">Siguiente →</button>`
@@ -954,7 +954,12 @@ function buildQuestions() {
       document.getElementById(`q${n}_${side}`).addEventListener('change', () => {
         answers[q.name] = (side==='yes');
         updateCounter();
-        if (!isLast) setTimeout(() => goNext(n), 460);
+        if (!isLast) {
+          setTimeout(() => goNext(n), 460);
+        } else {
+          const submitBtn = document.getElementById('submit-btn');
+          if (submitBtn) submitBtn.style.display = '';
+        }
       });
     });
   });

@@ -97,4 +97,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.href = 'login.html';
         });
     }
+
+    // Actualizar enlaces con el device_id actual
+    const savedDeviceId = localStorage.getItem('ramedio_real_device_id');
+    if (savedDeviceId) {
+        const liveLink = document.getElementById('live-dashboard-link');
+        const newDiagLink = document.getElementById('new-diag-link');
+        if (liveLink) liveLink.href = `dashboard.html?device_id=${encodeURIComponent(savedDeviceId)}`;
+        if (newDiagLink) newDiagLink.href = `index.html?device_id=${encodeURIComponent(savedDeviceId)}`;
+    }
 });

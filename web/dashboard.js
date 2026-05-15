@@ -428,3 +428,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         treeChart.resize();
     });
 });
+
+function downloadDashboardPDF() {
+    const el = document.getElementById('dashboard-content');
+    const opt = {
+        margin: 0.3,
+        filename: 'Dashboard_Tecnico_RAMedio.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: true, backgroundColor: '#060f1c' },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(el).save();
+}
