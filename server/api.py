@@ -324,10 +324,15 @@ def run_diagnostics(device_id: str, symptom_id: int = None, db: Session = Depend
             "device_id": device_id,
             "hardware_timestamp": latest_metric.timestamp,
             "symptoms_timestamp": latest_symptoms.timestamp,
+            "timestamp_hw": latest_metric.timestamp,
+            "timestamp_sym": latest_symptoms.timestamp,
             "diagnostico_ml": prediction_label,
             "solucion": soluciones.get(prediction_label, "Se requiere revisión técnica detallada."),
+            "regla_explicacion": soluciones.get(prediction_label, "Se requiere revisión técnica detallada."),
             "probabilidades": diagnosis_obj["probabilities"],
-            "decision_path": diagnosis_obj["decision_path"]
+            "decision_path": diagnosis_obj["decision_path"],
+            "hardware": hardware_data,
+            "symptoms": symptoms_data
         }
     except Exception as e:
         import traceback

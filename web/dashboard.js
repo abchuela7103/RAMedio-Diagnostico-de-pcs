@@ -445,7 +445,7 @@ function downloadDashboardPDF() {
     pdfContainer.style.fontFamily = 'Arial, sans-serif';
     pdfContainer.style.color = '#000';
     pdfContainer.style.background = '#fff';
-    pdfContainer.style.width = '800px'; 
+    pdfContainer.style.width = '700px'; 
     
     const symptomsMap = {
         "is_slow": "Sistema muy lento",

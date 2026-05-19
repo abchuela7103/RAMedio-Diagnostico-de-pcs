@@ -749,7 +749,6 @@
     <div class="trust-row">
       <div class="trust-item"><div class="ti-dot"></div> Tus datos no se comparten</div>
       <div class="trust-item"><div class="ti-dot"></div> Sin cambios sin tu permiso</div>
-      <div class="trust-item"><div class="ti-dot"></div> 100% seguro</div>
     </div>
   </header>
 
@@ -1220,6 +1219,7 @@ function renderResult(mlData, payload) {
 /* ── RESET ── */
 document.getElementById('reset-btn').addEventListener('click', ()=>{
   answers={}; yesCount=0;
+  updateCounter();
   document.getElementById('index-tree-chart').style.display='none';
   startForm();
 });
