@@ -28,3 +28,4 @@
 {"device_id": "DESKTOP-EDTV461", "timestamp": "2026-05-19T04:57:24.163382+00:00", "metrics": {"cpu": 4.04, "ram": 64.8, "disk": 84.0, "disk_active": 0.0, "gpu": 0.0, "battery": null}}
 {"device_id": "DESKTOP-EDTV461", "timestamp": "2026-05-19T05:01:28.550060+00:00", "metrics": {"cpu": 3.78, "ram": 66.02, "disk": 84.0, "disk_active": 0.0, "gpu": 0.0, "battery": null}}
 {"device_id": "DESKTOP-EDTV461", "timestamp": "2026-05-19T05:12:00.144593+00:00", "metrics": {"cpu": 3.16, "ram": 66.1, "disk": 84.0, "disk_active": 0.0, "gpu": 4.2, "battery": null}}
+{"device_id": "DESKTOP-EDTV461", "timestamp": "2026-05-19T05:21:49.558425+00:00", "metrics": {"cpu": 6.62, "ram": 52.78, "disk": 84.0, "disk_active": 0.0, "gpu": 8.0, "battery": null}}
