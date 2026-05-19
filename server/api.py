@@ -191,7 +191,7 @@ def get_user_scans(current_user: User = Depends(get_current_user), db: Session =
         result.append({
             "id": s.id,
             "device_id": s.device_id,
-            "timestamp": s.timestamp.isoformat(),
+            "timestamp": s.timestamp.isoformat() + "Z",
             "verdict": verdict
         })
     return {"scans": result}
@@ -322,10 +322,10 @@ def run_diagnostics(device_id: str, symptom_id: int = None, db: Session = Depend
         
         return {
             "device_id": device_id,
-            "hardware_timestamp": latest_metric.timestamp,
-            "symptoms_timestamp": latest_symptoms.timestamp,
-            "timestamp_hw": latest_metric.timestamp,
-            "timestamp_sym": latest_symptoms.timestamp,
+            "hardware_timestamp": latest_metric.timestamp.isoformat() + "Z",
+            "symptoms_timestamp": latest_symptoms.timestamp.isoformat() + "Z",
+            "timestamp_hw": latest_metric.timestamp.isoformat() + "Z",
+            "timestamp_sym": latest_symptoms.timestamp.isoformat() + "Z",
             "diagnostico_ml": prediction_label,
             "solucion": soluciones.get(prediction_label, "Se requiere revisión técnica detallada."),
             "regla_explicacion": soluciones.get(prediction_label, "Se requiere revisión técnica detallada."),
@@ -356,7 +356,7 @@ def get_device_history(device_id: str, db: Session = Depends(get_db)):
     records = db.query(MetricRecord).filter(MetricRecord.device_id == device_id).order_by(MetricRecord.timestamp.desc()).limit(20).all()
     records.reverse()
     return {
-        "timestamps": [r.timestamp.strftime("%H:%M:%S") for r in records],
+        "timestamps": [(r.timestamp.isoformat() + "Z") for r in records],
         "cpu": [r.cpu for r in records],
         "ram": [r.ram for r in records],
         "disk": [r.disk or 0 for r in records],
