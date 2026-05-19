@@ -269,6 +269,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
             
+            // Guardar para el reporte PDF
+            window.lastDiagnosticData = data;
+            
             // Modificar Título principal y Sugerencia
             document.getElementById('current-diagnosis-text').textContent = "Veredicto IA: " + data.diagnostico_ml;
             
@@ -430,13 +433,99 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function downloadDashboardPDF() {
-    const el = document.getElementById('dashboard-content');
+    if (!window.lastDiagnosticData) {
+        alert('Aún no hay datos cargados para generar el PDF.');
+        return;
+    }
+    const data = window.lastDiagnosticData;
+    
+    // Create a hidden div for PDF rendering
+    const pdfContainer = document.createElement('div');
+    pdfContainer.style.padding = '40px';
+    pdfContainer.style.fontFamily = 'Arial, sans-serif';
+    pdfContainer.style.color = '#000';
+    pdfContainer.style.background = '#fff';
+    pdfContainer.style.width = '700px'; 
+    
+    const symptomsMap = {
+        "is_slow": "Sistema muy lento",
+        "random_restarts": "Reinicios aleatorios",
+        "weird_noises": "Ruidos extraños",
+        "overheating": "Sobrecalentamiento",
+        "bsod_errors": "Pantallazos azules (BSOD)",
+        "screen_flicker": "Parpadeo de pantalla",
+        "apps_crashing": "Cierre inesperado de aplicaciones",
+        "battery_issue": "Problemas de batería",
+        "burnt_smell": "Olor a quemado",
+        "visual_artifacts": "Artefactos visuales",
+        "system_freezes": "Congelamientos del sistema",
+        "usb_disconnects": "Desconexiones USB",
+        "network_drops": "Caídas de red",
+        "slow_boot": "Arranque lento",
+        "file_corruption": "Corrupción de archivos"
+    };
+
+    let symptomsList = '';
+    if (data.symptoms) {
+        for (let key in data.symptoms) {
+            if (data.symptoms[key]) {
+                symptomsList += `<li>${symptomsMap[key] || key}</li>`;
+            }
+        }
+    }
+    if (!symptomsList) symptomsList = '<li>Ninguno reportado</li>';
+
+    let hwList = '';
+    if (data.hardware) {
+        hwList = `
+            <li><strong>CPU:</strong> ${data.hardware.cpu || 0}%</li>
+            <li><strong>RAM:</strong> ${data.hardware.ram || 0}%</li>
+            <li><strong>Disco:</strong> ${data.hardware.disk || 0}%</li>
+            <li><strong>GPU:</strong> ${data.hardware.gpu || 0}%</li>
+        `;
+    }
+
+    const dateStr = new Date(data.timestamp_hw || data.timestamp_sym || new Date()).toLocaleString();
+
+    pdfContainer.innerHTML = `
+        <div style="border-bottom: 2px solid #2d8cf0; padding-bottom: 15px; margin-bottom: 20px;">
+            <h1 style="color: #1565c0; margin: 0;">Reporte de Diagnóstico RAMedio</h1>
+            <p style="color: #555; margin: 5px 0 0 0;">Generado para uso técnico</p>
+        </div>
+        
+        <table style="width: 100%; margin-bottom: 25px;">
+            <tr>
+                <td><strong>ID del Equipo:</strong> ${data.device_id || 'Desconocido'}</td>
+                <td style="text-align: right;"><strong>Fecha:</strong> ${dateStr}</td>
+            </tr>
+        </table>
+        
+        <div style="background-color: #f8f9fa; border-left: 5px solid #2d8cf0; padding: 15px; margin-bottom: 25px;">
+            <h2 style="margin-top: 0; color: #333; font-size: 1.4rem;">Veredicto de la IA</h2>
+            <p style="font-size: 1.2rem; font-weight: bold; color: ${data.diagnostico_ml && data.diagnostico_ml.includes('Saludable') ? '#22d3a0' : '#f87171'}; margin: 0;">${data.diagnostico_ml || 'No disponible'}</p>
+        </div>
+        
+        <h3 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Métricas de Hardware</h3>
+        <ul style="list-style-type: none; padding-left: 0; margin-bottom: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            ${hwList}
+        </ul>
+        
+        <h3 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Síntomas Detectados</h3>
+        <ul style="margin-bottom: 25px;">
+            ${symptomsList}
+        </ul>
+        
+        <h3 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Explicación Técnica (Regla del Árbol)</h3>
+        <p style="line-height: 1.6; color: #444; background: #f1f5f9; padding: 15px; border-radius: 5px;">${data.regla_explicacion || 'No disponible'}</p>
+    `;
+
     const opt = {
-        margin: 0.3,
-        filename: 'Dashboard_Tecnico_RAMedio.pdf',
+        margin: 0.5,
+        filename: 'Reporte_Tecnico_RAMedio.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: true, backgroundColor: '#060f1c' },
+        html2canvas: { scale: 2, useCORS: true, logging: true },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
-    html2pdf().set(opt).from(el).save();
+    
+    html2pdf().set(opt).from(pdfContainer).save();
 }
