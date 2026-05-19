@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     xAxis: {
                         type: 'category',
                         boundaryGap: false,
-                        data: data.timestamps.map(ts => new Date(ts).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'})),
+                        data: data.timestamps.map(ts => new Date(ts).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: false})),
                         axisLabel: { color: '#aaa', rotate: 45, hideOverlap: true }
                     },
                     yAxis: {
