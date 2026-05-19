@@ -1,0 +1,8 @@
+{
+  "accuracy_train": 92.88,
+  "accuracy_test": 88.48,
+  "n_samples_train": 20000,
+  "n_samples_test": 5000,
+  "tree_depth": 18,
+  "n_nodes": 1329
+}
