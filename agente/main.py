@@ -245,12 +245,12 @@ class AgenteApp:
         self.btn_frame = ctk.CTkFrame(self.panel, fg_color="transparent")
         self.btn_frame.pack(pady=20)
         
-        self.btn_iniciar = ctk.CTkButton(self.btn_frame, text="▶ Ejecutar Agente", font=("Helvetica", 15, "bold"), 
+        self.btn_iniciar = ctk.CTkButton(self.btn_frame, text="Ejecutar Agente", font=("Helvetica", 15, "bold"), 
                                          width=220, height=50, corner_radius=10, fg_color=PRIMARY, hover_color="#2563eb",
                                          command=self.ejecutar_recoleccion)
         self.btn_iniciar.pack(side="left", padx=10)
         
-        self.btn_formulario = ctk.CTkButton(self.btn_frame, text="📋 Ir a Dashboard Web", font=("Helvetica", 15, "bold"), 
+        self.btn_formulario = ctk.CTkButton(self.btn_frame, text="Ir a Dashboard Web", font=("Helvetica", 15, "bold"), 
                                             width=220, height=50, corner_radius=10, fg_color="transparent", 
                                             border_width=2, border_color=PRIMARY, hover_color="#1e293b", text_color=PRIMARY,
                                             command=self.abrir_formulario)
