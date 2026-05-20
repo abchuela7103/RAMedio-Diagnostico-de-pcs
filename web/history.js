@@ -38,12 +38,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const d = new Date(scan.timestamp);
                 const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 
-                let verdictColor = '#22d3a0';
+                let verdictColor = '#22d3a0'; // Verde por defecto
                 let verdictIcon = 'fa-check-circle';
                 if (scan.verdict) {
                     const v = scan.verdict.toLowerCase();
-                    if (v.includes('crítico') || v.includes('severa') || v.includes('error')) { verdictColor = '#f87171'; verdictIcon = 'fa-triangle-exclamation'; }
-                    else if (v.includes('moderada') || v.includes('leve') || v.includes('alerta')) { verdictColor = '#f59e0b'; verdictIcon = 'fa-triangle-exclamation'; }
+                    
+                    // Naranja (Avisos importantes pero no fatales)
+                    if (v.includes('cuello de botella') || v.includes('adaptador de red') || v.includes('saturación')) {
+                        verdictColor = '#f59e0b';
+                        verdictIcon = 'fa-triangle-exclamation';
+                    }
+                    // Rojo (Problemas críticos)
+                    else if (!v.includes('saludable')) {
+                        verdictColor = '#ef4444'; 
+                        verdictIcon = 'fa-circle-xmark';
+                    }
                 }
 
                 col.innerHTML = `
