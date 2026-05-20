@@ -783,10 +783,14 @@
       </div>
     </div>
 
-    <button class="btn-primary-full" onclick="startForm()">
-      <i class="fa-solid fa-play"></i> Comenzar diagnóstico
-    </button>
-
+    <div style="display: flex; gap: 15px; margin-bottom: 24px;">
+      <button class="btn-primary-full" onclick="startForm()" style="flex: 2; margin-bottom: 0;">
+        <i class="fa-solid fa-play"></i> Comenzar diagnóstico
+      </button>
+      <button onclick="window.location.href='history.html'" style="flex: 1; padding: 16px; border-radius: var(--r-btn); background: var(--bg-inner); color: var(--txt); border: 1.5px solid var(--border-soft); cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; transition: border-color 0.3s ease;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border-soft)'">
+        <i class="fa-solid fa-chart-line" style="color: var(--primary);"></i> Dashboard
+      </button>
+    </div>
     <div class="assurance-footer">
       <div class="assurance-item"><i class="fa-solid fa-lock"></i> Datos privados</div>
       <div class="assurance-item"><i class="fa-solid fa-bolt"></i> Menos de 2 minutos</div>
