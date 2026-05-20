@@ -279,7 +279,8 @@ class AgenteApp:
                         metrics_history["battery_pct"].append(bat.get("percent", 0.0) or 0.0)
                         metrics_history["battery_plug"].append(bat.get("power_plugged", False))
                     self.root.after(0, lambda i=i: self.progress.set((i+1)*0.2))
-                    time.sleep(1.5)
+                    # Esperar 10 segundos antes del siguiente envío (reduce bloqueos en SQLite)
+                    time.sleep(10)
 
                 avg_data = {
                     "cpu": round(sum(metrics_history["cpu"]) / 5, 2),
