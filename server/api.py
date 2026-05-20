@@ -150,11 +150,24 @@ def get_user_scans(current_user: User = Depends(get_current_user), db: Session =
     
     scans = db.query(SymptomRecord).filter(SymptomRecord.device_id.in_(device_ids)).order_by(SymptomRecord.timestamp.desc()).all()
     
+    # Optimización: Traer todas las métricas a la memoria en una sola consulta para no bloquear SQLite por OneDrive
+    all_metrics = db.query(MetricRecord).filter(MetricRecord.device_id.in_(device_ids)).order_by(MetricRecord.timestamp.desc()).all()
+    
     result = []
     for s in scans:
-        latest_metric = db.query(MetricRecord).filter(MetricRecord.device_id == s.device_id, MetricRecord.timestamp <= s.timestamp).order_by(MetricRecord.timestamp.desc()).first()
+        # Buscar en memoria la métrica más reciente antes del escaneo
+        latest_metric = None
+        for m in all_metrics:
+            if m.device_id == s.device_id and m.timestamp <= s.timestamp:
+                latest_metric = m
+                break
+                
         if not latest_metric:
-            latest_metric = db.query(MetricRecord).filter(MetricRecord.device_id == s.device_id).order_by(MetricRecord.timestamp.asc()).first()
+            # Buscar la más antigua si no hay ninguna antes
+            for m in reversed(all_metrics):
+                if m.device_id == s.device_id:
+                    latest_metric = m
+                    break
             
         verdict = "Pendiente"
         if latest_metric:
