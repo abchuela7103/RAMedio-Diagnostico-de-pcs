@@ -47,20 +47,31 @@ def generate_data(num_samples: int = 25000) -> pd.DataFrame:
     for _ in range(num_samples):
         # ── Hardware base (sistema en reposo) ───────────────────────────────
         row = {
-            "cpu":         float(np.clip(rng.normal(30, 18), 0, 100)),
-            "ram":         float(np.clip(rng.normal(42, 22), 0, 100)),
-            "disk":        float(np.clip(rng.normal(22, 12), 0, 100)),
-            "disk_active": float(np.clip(rng.exponential(7),  0, 100)),
-            "gpu":         float(np.clip(rng.lognormal(1.2, 1), 0, 100)),
+            "cpu":         float(np.clip(rng.normal(30, 15), 0, 100)),
+            "ram":         float(np.clip(rng.normal(42, 15), 0, 100)),
+            "disk":        float(np.clip(rng.normal(22, 10), 0, 100)),
+            "disk_active": float(np.clip(rng.exponential(5),  0, 100)),
+            "gpu":         float(np.clip(rng.lognormal(1.0, 0.8), 0, 100)),
         }
-        # Síntomas base (ruido: 8% de chance de síntoma espurio en sistema sano)
+        # Iniciar sin síntomas
         for k in symptom_keys:
-            row[k] = int(rng.random() < 0.08)
+            row[k] = 0
 
         scenario = rng.choice(scenarios, p=probs)
 
+        # Si NO es saludable, agregamos un poco de ruido (síntomas extra aleatorios)
+        if scenario != "healthy":
+            for k in symptom_keys:
+                if rng.random() < 0.05: # 5% de ruido para camuflar patrones
+                    row[k] = 1
+
         # ── Escenarios específicos ────────────────────────────────────────────
-        if scenario == "thermal":
+        if scenario == "healthy":
+            # Sistema saludable casi perfecto. Máximo 1 síntoma súper leve.
+            if rng.random() < 0.15:
+                random_symptom = rng.choice(["is_slow", "weird_noises", "slow_boot"])
+                row[random_symptom] = 1
+        elif scenario == "thermal":
             row["overheating"]     = int(rng.random() < 0.88)
             row["cpu"]             = float(np.clip(rng.normal(88, 10), 0, 100))
             row["gpu"]             = float(np.clip(rng.normal(82, 15), 0, 100))
