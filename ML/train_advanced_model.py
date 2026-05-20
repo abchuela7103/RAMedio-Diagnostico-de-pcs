@@ -73,33 +73,36 @@ def generate_data(num_samples: int = 25000) -> pd.DataFrame:
                 row[random_symptom] = 1
         elif scenario == "thermal":
             row["overheating"]     = int(rng.random() < 0.88)
-            row["cpu"]             = float(np.clip(rng.normal(88, 10), 0, 100))
-            row["gpu"]             = float(np.clip(rng.normal(82, 15), 0, 100))
             row["is_slow"]         = int(rng.random() < 0.88)
             row["random_restarts"] = int(rng.random() < 0.38)
-            # Casos ambiguos: a veces el equipo se calienta sin que el usuario lo note
+            
+            # 60% del tiempo el equipo está caliente AHORA. 40% del tiempo el usuario lo reporta pero el PC está en reposo.
+            if rng.random() < 0.60:
+                row["cpu"]             = float(np.clip(rng.normal(88, 10), 0, 100))
+                row["gpu"]             = float(np.clip(rng.normal(82, 15), 0, 100))
+                
+            # Casos ambiguos: silencioso pero caliente
             if rng.random() < 0.15:
-                row["overheating"] = 0  # Silencioso pero CPU alta
+                row["overheating"] = 0
 
         elif scenario == "gpu_failure":
             row["visual_artifacts"] = int(rng.random() < 0.82)
             row["screen_flicker"]   = int(rng.random() < 0.68)
             row["apps_crashing"]    = int(rng.random() < 0.55)
-            # GPU puede estar a 0 (muerta) o a tope
-            row["gpu"] = float(np.clip(
-                rng.choice([rng.normal(96, 4), rng.normal(2, 3)]), 0, 100
-            ))
-            # Caso ambiguo: artefactos sin GPU disparada (driver issue)
-            if rng.random() < 0.20:
-                row["gpu"] = float(np.clip(rng.normal(45, 15), 0, 100))
+            
+            # La GPU puede estar al 100% o en 0% o normal (problema de drivers)
+            if rng.random() < 0.60:
+                row["gpu"] = float(np.clip(rng.choice([rng.normal(96, 4), rng.normal(2, 3)]), 0, 100))
 
         elif scenario == "hdd_failure":
             row["file_corruption"] = int(rng.random() < 0.65)
             row["weird_noises"]    = int(rng.random() < 0.72)
-            row["disk_active"]     = float(np.clip(rng.normal(93, 7), 0, 100))
             row["slow_boot"]       = int(rng.random() < 0.88)
             row["is_slow"]         = 1
-            # Disco puede fallar sin ruidos (SSD)
+            
+            if rng.random() < 0.60:
+                row["disk_active"]     = float(np.clip(rng.normal(93, 7), 0, 100))
+                
             if rng.random() < 0.25:
                 row["weird_noises"] = 0
 
@@ -107,9 +110,11 @@ def generate_data(num_samples: int = 25000) -> pd.DataFrame:
             row["system_freezes"] = int(rng.random() < 0.78)
             row["bsod_errors"]    = int(rng.random() < 0.62)
             row["apps_crashing"]  = int(rng.random() < 0.70)
-            row["ram"]            = float(np.clip(rng.normal(94, 5), 0, 100))
             row["is_slow"]        = int(rng.random() < 0.72)
-            # Caso ambiguo: RAM al límite pero sin BSODs aún
+            
+            if rng.random() < 0.60:
+                row["ram"]            = float(np.clip(rng.normal(94, 5), 0, 100))
+                
             if rng.random() < 0.20:
                 row["bsod_errors"] = 0
 
@@ -123,31 +128,26 @@ def generate_data(num_samples: int = 25000) -> pd.DataFrame:
                 row["random_restarts"] = 0
 
         elif scenario == "network":
-            row["network_drops"] = int(rng.random() < 0.93)
-            row["is_slow"]       = int(rng.random() < 0.28)
-            # Caso ambiguo: lentitud web sin network_drops detectados
-            if rng.random() < 0.12:
-                row["network_drops"] = 0
-                row["is_slow"]       = 1
+            # Requiere caídas de red el 98% de las veces.
+            row["network_drops"] = int(rng.random() < 0.98)
+            row["is_slow"]       = int(rng.random() < 0.40)
 
         elif scenario == "cpu_bottleneck":
-            row["cpu"]          = float(np.clip(rng.normal(97, 3), 0, 100))
             row["is_slow"]      = 1
             row["apps_crashing"]= int(rng.random() < 0.32)
             row["slow_boot"]    = int(rng.random() < 0.55)
-            # Caso ambiguo: CPU muy alta pero en ráfaga corta
-            if rng.random() < 0.15:
-                row["cpu"] = float(np.clip(rng.normal(72, 8), 0, 100))
+            
+            if rng.random() < 0.60:
+                row["cpu"]          = float(np.clip(rng.normal(97, 3), 0, 100))
 
         elif scenario == "malware":
-            row["cpu"]          = float(np.clip(rng.normal(84, 12), 0, 100))
-            row["disk_active"]  = float(np.clip(rng.normal(65, 22), 0, 100))
             row["network_drops"]= int(rng.random() < 0.42)
             row["is_slow"]      = 1
             row["system_freezes"] = int(rng.random() < 0.32)
-            # Caso ambiguo: malware muy sigiloso con CPU moderada
-            if rng.random() < 0.22:
-                row["cpu"] = float(np.clip(rng.normal(55, 10), 0, 100))
+            
+            if rng.random() < 0.60:
+                row["cpu"]          = float(np.clip(rng.normal(84, 12), 0, 100))
+                row["disk_active"]  = float(np.clip(rng.normal(65, 22), 0, 100))
 
         row["label"] = LABELS[scenario]
         data.append(row)
