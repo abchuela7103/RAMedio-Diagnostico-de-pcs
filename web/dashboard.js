@@ -177,8 +177,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     xAxis: {
                         type: 'category',
                         boundaryGap: false,
-                        data: data.timestamps,
-                        axisLabel: { color: '#aaa', rotate: 45, hideOverlap: true }
+                        data: data.timestamps.map((ts, index) => `Registro ${index + 1}`),
+                        axisLabel: { show: false }
                     },
                     yAxis: {
                         type: 'value',
@@ -524,7 +524,8 @@ function downloadDashboardPDF() {
         filename: 'Reporte_Tecnico_RAMedio.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, logging: true },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     };
     
     html2pdf().set(opt).from(pdfContainer).save();
