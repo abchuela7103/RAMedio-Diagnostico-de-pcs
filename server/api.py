@@ -7,6 +7,12 @@ from datetime import datetime, timedelta
 import json
 import hashlib
 import os
+import sys
+import traceback
+
+# Precargar el modelo de IA y agregarlo al PATH globalmente
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from ML.classifier import predict_status_with_proba, get_tree_structure, get_model_accuracy
 
 from database import engine, get_db, Base
 from models import MetricRecord, SymptomRecord, User, UserSession, UserDevice
@@ -143,12 +149,6 @@ def get_user_scans(current_user: User = Depends(get_current_user), db: Session =
         return {"scans": []}
     
     scans = db.query(SymptomRecord).filter(SymptomRecord.device_id.in_(device_ids)).order_by(SymptomRecord.timestamp.desc()).all()
-    
-    import sys
-    import os
-    if os.path.dirname(os.path.dirname(os.path.abspath(__file__))) not in sys.path:
-        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from ML.classifier import predict_status_with_proba
     
     result = []
     for s in scans:
@@ -296,14 +296,7 @@ def run_diagnostics(device_id: str, symptom_id: int = None, db: Session = Depend
             "file_corruption": latest_symptoms.file_corruption
         }
         
-        # 4. Importar dinámicamente y predecir
-        import sys
-        import os
-        import traceback
-        # Agregar carpeta raíz al path para poder importar desde ML
-        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        from ML.classifier import predict_status_with_proba
-        
+        # 4. Predecir (el modelo ya está cargado en caché globalmente)
         diagnosis_obj = predict_status_with_proba(hardware_data, symptoms_data)
         prediction_label = diagnosis_obj["prediction"]
         
@@ -367,11 +360,6 @@ def get_device_history(device_id: str, db: Session = Depends(get_db)):
 @app.get("/api/ml/tree")
 def get_ml_tree():
     """Obtiene la estructura del árbol de decisión y la precisión para ECharts."""
-    import sys
-    import os
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from ML.classifier import get_tree_structure, get_model_accuracy
-    
     return {
         "accuracy": get_model_accuracy(),
         "tree": get_tree_structure()
